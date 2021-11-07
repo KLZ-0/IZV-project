@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os.path
+import sys
+import re
+import urllib.parse
+from pathlib import Path
+
 import numpy as np
 import zipfile
 
 
 # Kromě vestavěných knihoven (os, sys, re, requests …) byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
 # Další knihovny je možné použít po schválení opravujícím (např ve fóru WIS).
+import requests
+from bs4 import BeautifulSoup
 
 
 class DataDownloader:
@@ -41,10 +49,36 @@ class DataDownloader:
     }
 
     def __init__(self, url="https://ehw.fit.vutbr.cz/izv/", folder="data", cache_filename="data_{}.pkl.gz"):
-        pass
+        self._url = url
+        self._folder = folder
+        self._cache_filename = cache_filename
 
     def download_data(self):
-        pass
+        Path(self._folder).mkdir(parents=True, exist_ok=True)
+
+        resp = requests.get(self._url)
+        if resp.status_code != 200:
+            print(f"Error: repsonse code {resp.status_code}", file=sys.stderr)
+            return
+
+        soup = BeautifulSoup(resp.text, features="html.parser")
+        for button in soup.findAll("button"):
+            file_location = button["onclick"].split("'")[1]
+            file_name = os.path.basename(file_location)
+
+            url = urllib.parse.urljoin(self._url, file_location)
+            dest = os.path.join(self._folder, file_name)
+
+            print(f"Downloading: {file_name}")
+            with requests.get(url, stream=True) as r:
+                with open(dest, "wb") as f:
+                    for chunk in r:
+                        f.write(chunk)
+
+        # table = soup.find("table")
+        # # print(table)
+        # for row in table.findAll("tr"):
+        #     for cell in row.findAll("td"):
 
     def parse_region_data(self, region):
         pass
@@ -54,3 +88,6 @@ class DataDownloader:
 
 
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
+if __name__ == '__main__':
+    dd = DataDownloader(folder="/tmp/izv-data")
+    dd.download_data()
