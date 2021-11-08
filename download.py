@@ -48,6 +48,9 @@ class DataDownloader:
         "KVK": "19",
     }
 
+    _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
+    _re_file_december = re.compile(r"data-?gis-?(rok)?-?(\d\d\d\d).*")
+
     def __init__(self, url="https://ehw.fit.vutbr.cz/izv/", folder="data", cache_filename="data_{}.pkl.gz"):
         self._url = url
         self._folder = folder
@@ -70,10 +73,10 @@ class DataDownloader:
             dest = os.path.join(self._folder, file_name)
 
             if Path(dest).exists():
-                print(f"Skipping: {file_name}")
+                # print(f"Skipping: {file_name}")
                 continue
 
-            print(f"Downloading: {file_name}")
+            # print(f"Downloading: {file_name}")
             with requests.get(url, stream=True) as r:
                 with open(dest, "wb") as f:
                     for chunk in r:
@@ -84,8 +87,31 @@ class DataDownloader:
         # for row in table.findAll("tr"):
         #     for cell in row.findAll("td"):
 
+    def _decode_filename(self, filename):
+        res = self._re_file_standard.match(filename)
+        if res is not None:
+            return res.groups()
+        else:
+            res = self._re_file_december.match(filename)
+            if res is None:
+                return None
+
+            return "12", res.groups()[1]
+
     def parse_region_data(self, region):
-        pass
+        # self.download_data()
+
+        reg_code = self.regions.get(region)
+        if reg_code is None:
+            return
+
+        for file_zip in sorted(os.listdir(self._folder)):
+            when = self._decode_filename(file_zip)
+            if when is None:
+                print("!!!", file_zip)
+                continue
+
+            print(file_zip, when)
 
     def get_dict(self, regions=None):
         pass
@@ -94,4 +120,4 @@ class DataDownloader:
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
     dd = DataDownloader()
-    dd.download_data()
+    dd.parse_region_data("STC")
