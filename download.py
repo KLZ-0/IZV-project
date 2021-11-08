@@ -74,14 +74,33 @@ class DataDownloader:
     _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
     _re_file_december = re.compile(r"data-?gis-?(rok)?-?(\d\d\d\d).*")
 
+    _file_list = None
+
     def __init__(self, url="https://ehw.fit.vutbr.cz/izv/", folder="data", cache_filename="data_{}.pkl.gz"):
         self._url = url
         self._folder = folder
         self._cache_filename = cache_filename
         self.type_map = dict(zip(self.headers, self.types))
 
+    def _download_file_list(self):
+        for file_location in self._file_list:
+            dest = os.path.join(self._folder, os.path.basename(file_location))
+            if Path(dest).exists():
+                continue
+
+            url = urllib.parse.urljoin(self._url, file_location)
+            with requests.get(url, stream=True) as r:
+                with open(dest, "wb") as f:
+                    for chunk in r:
+                        f.write(chunk)
+
     def download_data(self):
         Path(self._folder).mkdir(parents=True, exist_ok=True)
+
+        # Download the file list only once
+        if self._file_list is not None:
+            self._download_file_list()
+            return
 
         resp = requests.get(self._url)
         if resp.status_code != 200:
@@ -89,22 +108,9 @@ class DataDownloader:
             return
 
         soup = BeautifulSoup(resp.text, features="html.parser")
-        for button in soup.findAll("button"):
-            file_location = button["onclick"].split("'")[1]
-            file_name = os.path.basename(file_location)
+        self._file_list = [button["onclick"].split("'")[1] for button in soup.findAll("button")]
 
-            url = urllib.parse.urljoin(self._url, file_location)
-            dest = os.path.join(self._folder, file_name)
-
-            if Path(dest).exists():
-                # print(f"Skipping: {file_name}")
-                continue
-
-            # print(f"Downloading: {file_name}")
-            with requests.get(url, stream=True) as r:
-                with open(dest, "wb") as f:
-                    for chunk in r:
-                        f.write(chunk)
+        self._download_file_list()
 
     def _decode_filename(self, filename):
         """
@@ -121,8 +127,7 @@ class DataDownloader:
             return "12", res.groups()[1]
 
     def parse_region_data(self, region):
-        if not Path(self._folder).exists():
-            self.download_data()
+        self.download_data()
 
         reg_code = self.regions.get(region)
         if reg_code is None:
