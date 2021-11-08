@@ -82,11 +82,6 @@ class DataDownloader:
                     for chunk in r:
                         f.write(chunk)
 
-        # table = soup.find("table")
-        # # print(table)
-        # for row in table.findAll("tr"):
-        #     for cell in row.findAll("td"):
-
     def _decode_filename(self, filename):
         """
         Decodes the given datagis file name into month and year
