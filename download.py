@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import csv
+import gzip
 import io
 import os.path
+import pickle
 import sys
 import re
 import urllib.parse
@@ -10,7 +12,6 @@ from pathlib import Path
 
 import numpy as np
 import zipfile
-
 
 # Kromě vestavěných knihoven (os, sys, re, requests …) byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
 # Další knihovny je možné použít po schválení opravujícím (např ve fóru WIS).
@@ -81,7 +82,7 @@ class DataDownloader:
     def __init__(self, url="https://ehw.fit.vutbr.cz/izv/", folder="data", cache_filename="data_{}.pkl.gz"):
         self._url = url
         self._folder = folder
-        self._cache_filename = cache_filename
+        self._cache_filename = os.path.join(folder, cache_filename)
         self.type_map = dict(zip(self.headers, self.types))
 
     def _download_file_list(self):
@@ -139,7 +140,6 @@ class DataDownloader:
 
         for file_zip in os.listdir(self._folder):
             if not file_zip.endswith(".zip"):
-                print("Not a ZIP file", file_zip, file=sys.stderr)
                 continue
 
             with zipfile.ZipFile(os.path.join(self._folder, file_zip), "r") as data_zip:
@@ -177,14 +177,28 @@ class DataDownloader:
 
         return dict2 if not dict1 else {key: np.append(dict1[key], nparr) for key, nparr in dict2.items()}
 
+    def _save_cache(self, region):
+        with gzip.open(self._cache_filename.format(region), "wb") as file_gz:
+            pickle.dump(self._cache_mem[region], file_gz)
+
+    def _load_cache(self, region):
+        if not Path(self._cache_filename.format(region)).exists():
+            return False
+
+        with gzip.open(self._cache_filename.format(region), "rb") as file_gz:
+            self._cache_mem[region] = pickle.load(file_gz)
+
+        return True
+
     def get_dict(self, regions=None):
         if regions is None or len(regions) == 0:
             regions = self.regions.keys()
 
         dataset = {}
         for wanted_region in regions:
-            if wanted_region not in self._cache_mem:
+            if wanted_region not in self._cache_mem and self._load_cache(wanted_region) is False:
                 self._cache_mem[wanted_region] = self.parse_region_data(wanted_region)
+                self._save_cache(wanted_region)
 
             dataset = self._merge_dicts(dataset, self._cache_mem[wanted_region])
 
@@ -203,6 +217,7 @@ if __name__ == '__main__':
     #     bigdata.append(dd.parse_region_data(reg))
 
     # bigdata = dd.get_dict()
+    # bigdata = dd.get_dict(["ZLK"])
     bigdata = dd.get_dict(["ZLK", "VYS"])
 
     print("MEM after", process.memory_info().rss / 1000000, "MB")
