@@ -88,14 +88,17 @@ class DataDownloader:
         #     for cell in row.findAll("td"):
 
     def _decode_filename(self, filename):
+        """
+        Decodes the given datagis file name into month and year
+        :param filename: file name to be decoded
+        :return: tuple(month : str, year : str) or None if got utter trash
+        """
         res = self._re_file_standard.match(filename)
         if res is not None:
             return res.groups()
-        else:
-            res = self._re_file_december.match(filename)
-            if res is None:
-                return None
 
+        res = self._re_file_december.match(filename)
+        if res is not None:
             return "12", res.groups()[1]
 
     def parse_region_data(self, region):
