@@ -13,7 +13,8 @@ from pathlib import Path
 import numpy as np
 import zipfile
 
-# Kromě vestavěných knihoven (os, sys, re, requests …) byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
+# Kromě vestavěných knihoven (os, sys, re, requests …)
+# byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
 # Další knihovny je možné použít po schválení opravujícím (např ve fóru WIS).
 import psutil as psutil
 import requests
