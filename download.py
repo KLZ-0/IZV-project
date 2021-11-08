@@ -14,6 +14,7 @@ import zipfile
 
 # Kromě vestavěných knihoven (os, sys, re, requests …) byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
 # Další knihovny je možné použít po schválení opravujícím (např ve fóru WIS).
+import psutil as psutil
 import requests
 from bs4 import BeautifulSoup
 
@@ -26,12 +27,28 @@ class DataDownloader:
         regions     Dictionary s nazvy kraju : nazev csv souboru
     """
 
-    headers = ["p1", "p36", "p37", "p2a", "weekday(p2a)", "p2b", "p6", "p7", "p8", "p9", "p10", "p11", "p12", "p13a",
-               "p13b", "p13c", "p14", "p15", "p16", "p17", "p18", "p19", "p20", "p21", "p22", "p23", "p24", "p27",
-               "p28",
-               "p34", "p35", "p39", "p44", "p45a", "p47", "p48a", "p49", "p50a", "p50b", "p51", "p52", "p53", "p55a",
-               "p57", "p58", "a", "b", "d", "e", "f", "g", "h", "i", "j", "k", "l", "n", "o", "p", "q", "r", "s", "t",
-               "p5a"]
+    # 64 total, 8 in each row
+    headers = [
+        "p1", "p36", "p37", "p2a", "weekday(p2a)", "p2b", "p6", "p7",
+        "p8", "p9", "p10", "p11", "p12", "p13a", "p13b", "p13c",
+        "p14", "p15", "p16", "p17", "p18", "p19", "p20", "p21",
+        "p22", "p23", "p24", "p27", "p28", "p34", "p35", "p39",
+        "p44", "p45a", "p47", "p48a", "p49", "p50a", "p50b", "p51",
+        "p52", "p53", "p55a", "p57", "p58", "a", "b", "d",
+        "e", "f", "g", "h", "i", "j", "k", "l",
+        "n", "o", "p", "q", "r", "s", "t", "p5a"
+    ]
+
+    types = [
+        "U", "i", "i", "M", "U", "i", "i", "i",
+        "i", "i", "i", "i", "i", "i", "i", "i",
+        "i", "i", "i", "i", "i", "i", "i", "i",
+        "i", "i", "i", "i", "i", "i", "i", "i",
+        "i", "i", "i", "i", "i", "i", "i", "i",
+        "i", "i", "i", "i", "i", "f", "f", "f",
+        "f", "f", "f", "U", "U", "i", "U", "U",
+        "U", "U", "U", "U", "i", "i", "U", "i"
+    ]
 
     regions = {
         "PHA": "00",
@@ -50,6 +67,10 @@ class DataDownloader:
         "KVK": "19",
     }
 
+    # replace these with a valid number
+    _invalid_num_values = ["", "XX"] + [c + ":" for c in "ABDEFGHIL"]
+    _invalid_num_replacement = "0"
+
     _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
     _re_file_december = re.compile(r"data-?gis-?(rok)?-?(\d\d\d\d).*")
 
@@ -57,6 +78,7 @@ class DataDownloader:
         self._url = url
         self._folder = folder
         self._cache_filename = cache_filename
+        self.type_map = dict(zip(self.headers, self.types))
 
     def download_data(self):
         Path(self._folder).mkdir(parents=True, exist_ok=True)
@@ -99,40 +121,43 @@ class DataDownloader:
             return "12", res.groups()[1]
 
     def parse_region_data(self, region):
-        # self.download_data()
+        if not Path(self._folder).exists():
+            self.download_data()
 
         reg_code = self.regions.get(region)
         if reg_code is None:
             return
 
-        dataset = []
+        dataset = {colname: [] for colname in self.headers}
+
         for file_zip in os.listdir(self._folder):
-            when = self._decode_filename(file_zip)
             if not file_zip.endswith(".zip"):
                 print("Not a ZIP file", file_zip, file=sys.stderr)
                 continue
 
-            if when is None:
-                print("!!!", file_zip)
-                continue
+            with zipfile.ZipFile(os.path.join(self._folder, file_zip), "r") as data_zip:
+                with data_zip.open(reg_code + ".csv", "r") as file_csv:
+                    data_csv = csv.reader(io.TextIOWrapper(file_csv, encoding="cp1250"), delimiter=";", quotechar="\"")
+                    for row in data_csv:
+                        for i, csv_col in enumerate(row):
+                            if self.types[i] in ["i", "f"] and csv_col in self._invalid_num_values:
+                                dataset[self.headers[i]].append(self._invalid_num_replacement)
+                                continue
 
-            print(file_zip, when)
-            with zipfile.ZipFile(os.path.join(self._folder, file_zip), "r") as zip_data:
-                with zip_data.open(reg_code + ".csv", "r") as csvfile:
-                    reader = csv.reader(io.TextIOWrapper(csvfile, encoding="cp1250"), delimiter=";")
+                            if self.types[i] == "f":
+                                csv_col = csv_col.replace(",", ".")
 
-                    for row in reader:
-                        dataset.append(list(row))
-                    # if dataset is None:
-                    #     dataset = np.asarray(list(reader))
-                    # else:
-                    #     dataset = np.concatenate((dataset, np.asarray(list(reader))))
+                            dataset[self.headers[i]].append(csv_col)
 
-                    # print(np.asarray(dataset))
-                    # return
+        for colname in dataset.keys():
+            try:
+                dataset[colname] = np.asarray(dataset[colname], dtype=self.type_map[colname])
+            except ValueError as e:
+                print(f"Conversion failed for {colname}", e)
 
-        arr = np.asarray(dataset)
-        print(arr, arr.shape)
+        dataset["region"] = np.full(dataset[self.headers[0]].shape[0], region)
+
+        return dataset
 
     def get_dict(self, regions=None):
         pass
@@ -140,5 +165,15 @@ class DataDownloader:
 
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
+    process = psutil.Process(os.getpid())
+    print("MEM before", process.memory_info().rss / 1000000, "MB")
+
     dd = DataDownloader()
-    dd.parse_region_data("STC")
+    bigdata = []
+    for reg in dd.regions.keys():
+        print(f"Processing {reg}")
+        bigdata.append(dd.parse_region_data(reg))
+
+    print("MEM after", process.memory_info().rss / 1000000, "MB")
+
+    print(len(bigdata))
