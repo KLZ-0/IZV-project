@@ -69,6 +69,10 @@ class DataDownloader:
             url = urllib.parse.urljoin(self._url, file_location)
             dest = os.path.join(self._folder, file_name)
 
+            if Path(dest).exists():
+                print(f"Skipping: {file_name}")
+                continue
+
             print(f"Downloading: {file_name}")
             with requests.get(url, stream=True) as r:
                 with open(dest, "wb") as f:
@@ -89,5 +93,5 @@ class DataDownloader:
 
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
-    dd = DataDownloader(folder="/tmp/izv-data")
+    dd = DataDownloader()
     dd.download_data()
