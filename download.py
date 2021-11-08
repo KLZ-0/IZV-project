@@ -21,11 +21,11 @@ from bs4 import BeautifulSoup
 
 
 class DataDownloader:
-    """ TODO: dokumentacni retezce 
-
+    """
     Attributes:
-        headers    Nazvy hlavicek jednotlivych CSV souboru, tyto nazvy nemente!  
-        regions     Dictionary s nazvy kraju : nazev csv souboru
+        headers     CSV column headers
+        types       CSV column types
+        regions     Dictionary map from county code to CSV file name
     """
 
     # 64 total, 8 in each row
@@ -68,24 +68,52 @@ class DataDownloader:
         "KVK": "19",
     }
 
-    # replace these with a valid number
+    # replace these sequences with _invalid_num_replacement
     _invalid_num_values = ["", "XX"] + [c + ":" for c in "ABDEFGHIL"]
     _invalid_num_replacement = "0"
 
+    # regex for most files
     _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
+    # regex for files which are supposed to be for december
     _re_file_december = re.compile(r"data-?gis-?(rok)?-?(\d\d\d\d).*")
 
+    # List of ZIP files - cached so we don't have to request self._url each time
     _file_list = None
 
+    # Memory cache for processed region data
     _cache_mem = {}
 
     def __init__(self, url="https://ehw.fit.vutbr.cz/izv/", folder="data", cache_filename="data_{}.pkl.gz"):
+        """
+        Initializes the DataDownloader
+        :param url: download URL containing the index of ZIP data files
+        :param folder: cache folder, contains the downloaded source ZIP files and processed cache
+        :param cache_filename: filename format string for storing cache files
+        """
         self._url = url
         self._folder = folder
         self._cache_filename = os.path.join(folder, cache_filename)
         self.type_map = dict(zip(self.headers, self.types))
 
+    def _decode_filename(self, filename):
+        """
+        Decodes the given datagis file name into month and year
+        :param filename: file name to be decoded
+        :return: tuple(month: str, year: str) or None if got utter trash
+        """
+        res = self._re_file_standard.match(filename)
+        if res is not None:
+            return res.groups()
+
+        res = self._re_file_december.match(filename)
+        if res is not None:
+            return "12", res.groups()[1]
+
     def _download_file_list(self):
+        """
+        Check for the existence of cached ZIP files in self._file_list and download them if necessary
+        :return: None
+        """
         for file_location in self._file_list:
             dest = os.path.join(self._folder, os.path.basename(file_location))
             if Path(dest).exists():
@@ -98,6 +126,10 @@ class DataDownloader:
                         f.write(chunk)
 
     def download_data(self):
+        """
+        Scrap the provided URL for every downloadable ZIP data file
+        :return: None
+        """
         Path(self._folder).mkdir(parents=True, exist_ok=True)
 
         # Download the file list only once
@@ -115,21 +147,12 @@ class DataDownloader:
 
         self._download_file_list()
 
-    def _decode_filename(self, filename):
-        """
-        Decodes the given datagis file name into month and year
-        :param filename: file name to be decoded
-        :return: tuple(month : str, year : str) or None if got utter trash
-        """
-        res = self._re_file_standard.match(filename)
-        if res is not None:
-            return res.groups()
-
-        res = self._re_file_december.match(filename)
-        if res is not None:
-            return "12", res.groups()[1]
-
     def parse_region_data(self, region):
+        """
+        Parse the data for the specified region into a dictionary
+        :param region:
+        :return: dict({(header: str): (values: np.array)})
+        """
         self.download_data()
 
         reg_code = self.regions.get(region)
@@ -169,19 +192,29 @@ class DataDownloader:
     @staticmethod
     def _merge_dicts(dict1, dict2):
         """
-        Merge dict2 into dict1, dict1 can be empty
-        :param dict1: target dict
-        :param dict2: source dict
+        Return dict2 merged into dict1, dict1 can be empty
+        :param dict1: dict with the base data
+        :param dict2: dict with the data to be appended
         :return: merged dicts
         """
 
         return dict2 if not dict1 else {key: np.append(dict1[key], nparr) for key, nparr in dict2.items()}
 
     def _save_cache(self, region):
+        """
+        Save processed data for the given region as a gzip compressed pickle dump
+        :param region: region to save
+        :return: None
+        """
         with gzip.open(self._cache_filename.format(region), "wb") as file_gz:
             pickle.dump(self._cache_mem[region], file_gz)
 
     def _load_cache(self, region):
+        """
+        Load processed data for the given region from a gzip compressed pickle dump
+        :param region: region to save
+        :return: True if the cached region file exists and was successfully loaded, False otherwise
+        """
         if not Path(self._cache_filename.format(region)).exists():
             return False
 
@@ -191,6 +224,12 @@ class DataDownloader:
         return True
 
     def get_dict(self, regions=None):
+        """
+        Returns the merged dataset across every region listed in regions
+        The datasets are loaded from memory or a cache file, if neither exists parse_region_data is called
+        :param regions: List of regions or None, if None or len(regions) == 0 every region is assumed
+        :return: dict({(header: str): (values: np.array)})
+        """
         if regions is None or len(regions) == 0:
             regions = self.regions.keys()
 
