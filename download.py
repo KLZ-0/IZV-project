@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import csv
+import io
 import os.path
 import sys
 import re
@@ -103,13 +105,34 @@ class DataDownloader:
         if reg_code is None:
             return
 
-        for file_zip in sorted(os.listdir(self._folder)):
+        dataset = []
+        for file_zip in os.listdir(self._folder):
             when = self._decode_filename(file_zip)
+            if not file_zip.endswith(".zip"):
+                print("Not a ZIP file", file_zip, file=sys.stderr)
+                continue
+
             if when is None:
                 print("!!!", file_zip)
                 continue
 
             print(file_zip, when)
+            with zipfile.ZipFile(os.path.join(self._folder, file_zip), "r") as zip_data:
+                with zip_data.open(reg_code + ".csv", "r") as csvfile:
+                    reader = csv.reader(io.TextIOWrapper(csvfile, encoding="cp1250"), delimiter=";")
+
+                    for row in reader:
+                        dataset.append(list(row))
+                    # if dataset is None:
+                    #     dataset = np.asarray(list(reader))
+                    # else:
+                    #     dataset = np.concatenate((dataset, np.asarray(list(reader))))
+
+                    # print(np.asarray(dataset))
+                    # return
+
+        arr = np.asarray(dataset)
+        print(arr, arr.shape)
 
     def get_dict(self, regions=None):
         pass
