@@ -76,6 +76,8 @@ class DataDownloader:
 
     _file_list = None
 
+    _cache_mem = {}
+
     def __init__(self, url="https://ehw.fit.vutbr.cz/izv/", folder="data", cache_filename="data_{}.pkl.gz"):
         self._url = url
         self._folder = folder
@@ -164,8 +166,29 @@ class DataDownloader:
 
         return dataset
 
+    @staticmethod
+    def _merge_dicts(dict1, dict2):
+        """
+        Merge dict2 into dict1, dict1 can be empty
+        :param dict1: target dict
+        :param dict2: source dict
+        :return: merged dicts
+        """
+
+        return dict2 if not dict1 else {key: np.append(dict1[key], nparr) for key, nparr in dict2.items()}
+
     def get_dict(self, regions=None):
-        pass
+        if regions is None or len(regions) == 0:
+            regions = self.regions.keys()
+
+        dataset = {}
+        for wanted_region in regions:
+            if wanted_region not in self._cache_mem:
+                self._cache_mem[wanted_region] = self.parse_region_data(wanted_region)
+
+            dataset = self._merge_dicts(dataset, self._cache_mem[wanted_region])
+
+        return dataset
 
 
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
@@ -174,11 +197,14 @@ if __name__ == '__main__':
     print("MEM before", process.memory_info().rss / 1000000, "MB")
 
     dd = DataDownloader()
-    bigdata = []
-    for reg in dd.regions.keys():
-        print(f"Processing {reg}")
-        bigdata.append(dd.parse_region_data(reg))
+    # bigdata = []
+    # for reg in dd.regions.keys():
+    #     print(f"Processing {reg}")
+    #     bigdata.append(dd.parse_region_data(reg))
+
+    # bigdata = dd.get_dict()
+    bigdata = dd.get_dict(["ZLK", "VYS"])
 
     print("MEM after", process.memory_info().rss / 1000000, "MB")
 
-    print(len(bigdata))
+    print(bigdata)
