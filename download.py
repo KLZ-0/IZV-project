@@ -179,9 +179,11 @@ class DataDownloader:
 
                             dataset[self.headers[i]].append(csv_col)
 
+        indices = np.unique(dataset["p1"], return_index=True)[1]
+
         for colname in dataset.keys():
             try:
-                dataset[colname] = np.asarray(dataset[colname], dtype=self.type_map[colname])
+                dataset[colname] = np.asarray([dataset[colname][ind] for ind in indices], dtype=self.type_map[colname])
             except ValueError as e:
                 print(f"Conversion failed for {colname}", e)
 
@@ -247,7 +249,8 @@ class DataDownloader:
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
     dd = DataDownloader()
-    bigdata = dd.get_dict(["KVK", "JHC", "PLK"])
+    bigdata = dd.get_dict()
+    # bigdata = dd.get_dict(["PHA"])
 
     print("Headers:", " ".join(bigdata.keys()))
     print("Number of records:", bigdata['p1'].shape[0])
