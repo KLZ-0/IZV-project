@@ -30,6 +30,10 @@ def plot_stat(data_source,
     fig, ax = plt.subplots()
     im = ax.imshow(valarr)
 
+    # Create colorbar
+    cbar = ax.figure.colorbar(im, ax=ax)
+    cbar.ax.set_ylabel("Počet nehod", rotation=-90, va="bottom")
+
     # We want to show all ticks...
     ax.set_xticks(np.arange(len(regions)))
     ax.set_yticks(np.arange(len(causes)))
