@@ -16,7 +16,6 @@ import zipfile
 # Kromě vestavěných knihoven (os, sys, re, requests …)
 # byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
 # Další knihovny je možné použít po schválení opravujícím (např ve fóru WIS).
-import psutil as psutil
 import requests
 from bs4 import BeautifulSoup
 
@@ -26,7 +25,7 @@ class DataDownloader:
     Attributes:
         headers     CSV column headers
         types       CSV column types
-        regions     Dictionary map from county code to CSV file name
+        regions     Dictionary map from region code to CSV file name
     """
 
     # 64 total, 8 in each row
@@ -247,20 +246,9 @@ class DataDownloader:
 
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
-    os.remove("data/data_KVK.pkl.gz")
-    process = psutil.Process(os.getpid())
-    print("MEM before", process.memory_info().rss / 1000000, "MB")
-
     dd = DataDownloader()
-    # bigdata = []
-    # for reg in dd.regions.keys():
-    #     print(f"Processing {reg}")
-    #     bigdata.append(dd.parse_region_data(reg))
+    bigdata = dd.get_dict(["KVK", "JHC", "PLK"])
 
-    # bigdata = dd.get_dict()
-    bigdata = dd.get_dict(["KVK"])
-    # bigdata = dd.get_dict(["ZLK", "VYS"])
-
-    print("MEM after", process.memory_info().rss / 1000000, "MB")
-
-    print(bigdata)
+    print("Headers:", " ".join(bigdata.keys()))
+    print("Number of records:", bigdata['p1'].shape[0])
+    print("Regions:", " ".join(np.unique(bigdata['region'])))
