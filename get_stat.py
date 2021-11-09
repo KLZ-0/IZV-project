@@ -7,6 +7,7 @@ import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
 # povolene jsou pouze zakladni knihovny (os, sys) a knihovny numpy, matplotlib a argparse
+from matplotlib import cm
 
 from download import DataDownloader
 
@@ -29,18 +30,19 @@ def plot_stat(data_source,
             valarr[i][cause] = np.count_nonzero(regdata == cause)
 
     valarr = valarr.T[[1, 2, 3, 4, 5, 0]]
-    valarr2 = (valarr.T / np.sum(valarr, axis=1)).T
+    valarr2 = (valarr.T / np.sum(valarr, axis=1)).T * 100
+    valarr2[valarr2 == 0] = np.nan
 
     # draw
-    fig, (ax1, ax2) = plt.subplots(2, 1, sharex="all", sharey="all", figsize=(10, 8))
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex="all", sharey="all", figsize=(10, 7.5))
     im1 = ax1.imshow(valarr, norm=matplotlib.colors.LogNorm())
-    im2 = ax2.imshow(valarr2)
+    im2 = ax2.imshow(valarr2, cmap="plasma")
 
     # Create colorbar
     cbar1 = ax1.figure.colorbar(im1, ax=ax1)
-    cbar1.ax.set_ylabel("Počet nehod", rotation=-90, va="bottom")
+    cbar1.ax.set_ylabel("Počet nehod", rotation=90, va="top")
     cbar2 = ax2.figure.colorbar(im2, ax=ax2)
-    cbar2.ax.set_ylabel("Počet nehod", rotation=-90, va="bottom")
+    cbar2.ax.set_ylabel("Podíl nehod pro danou příčinu [%]", rotation=90, va="top")
 
     # We want to show all ticks...
     ax1.set_xticks(np.arange(len(regions)))
@@ -50,6 +52,7 @@ def plot_stat(data_source,
     ax1.set_yticklabels(causes)
 
     ax1.set_title("Absolutně")
+    ax2.set_title("Relativně vůči příčině")
     fig.tight_layout()
 
     if fig_location:
