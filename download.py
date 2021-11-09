@@ -71,7 +71,7 @@ class DataDownloader:
 
     # replace these sequences with _invalid_num_replacement
     _invalid_num_values = ["", "XX"] + [c + ":" for c in "ABDEFGHIL"]
-    _invalid_num_replacement = "0"
+    _invalid_num_replacement = -1
 
     # regex for most files
     _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
