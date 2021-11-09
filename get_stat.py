@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 # povolene jsou pouze zakladni knihovny (os, sys) a knihovny numpy, matplotlib a argparse
@@ -47,7 +50,13 @@ def plot_stat(data_source,
 
     ax.set_title("Absolutně")
     fig.tight_layout()
-    plt.show()
+
+    if fig_location:
+        Path(os.path.dirname(fig_location)).mkdir(parents=True, exist_ok=True)
+        plt.savefig(fig_location)
+
+    if show_figure:
+        plt.show()
 
 
 # TODO pri spusteni zpracovat argumenty
@@ -55,4 +64,4 @@ if __name__ == '__main__':
     dd = DataDownloader()
     data = dd.get_dict()
     # data = dd.get_dict(["KVK", "JHC", "PLK"])
-    plot_stat(data)
+    plot_stat(data, fig_location="/tmp/figs/fig1.png", show_figure=True)
