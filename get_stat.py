@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import argparse
 import os
 from pathlib import Path
 
@@ -65,8 +66,14 @@ def plot_stat(data_source,
 
 # TODO pri spusteni zpracovat argumenty
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Get basic stats")
+    parser.add_argument('--fig_location', default=None,
+                        help='Figure save location')
+    parser.add_argument('--show_figure', action='store_true',
+                        help='Show figures')
+
+    args = parser.parse_args()
+
     dd = DataDownloader()
     data = dd.get_dict()
-    # data = dd.get_dict(["KVK", "JHC", "PLK"])
-    plot_stat(data, fig_location="/tmp/figs/fig1.png", show_figure=True)
-    # plot_stat(data)
+    plot_stat(data, fig_location=args.fig_location, show_figure=args.show_figure)
