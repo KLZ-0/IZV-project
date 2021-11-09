@@ -14,12 +14,12 @@ def plot_stat(data_source,
     # p24
 
     regions = np.unique(data_source["region"])
-    print(regions)
 
     valarr = np.ndarray((regions.shape[0], 6), dtype="i")
     for i, region in enumerate(regions):
+        regdata = data_source["p24"][data_source["region"] == region]
         for cause in range(6):
-            valarr[i][cause] = np.count_nonzero(data_source["p24"][data_source["region"] == region] == cause)
+            valarr[i][cause] = np.count_nonzero(regdata == cause)
 
     print(valarr)
 
