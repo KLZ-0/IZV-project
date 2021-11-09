@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 from download import DataDownloader
 
+causes = ["Přerušovaná žlutá", "Semafor mimo provoz", "Dopravní značky", "Přenosné dopravní značky",
+          "Nevyznačena", "Žádná úprava"]
+
 
 def plot_stat(data_source,
               fig_location=None,
@@ -21,7 +24,22 @@ def plot_stat(data_source,
         for cause in range(6):
             valarr[i][cause] = np.count_nonzero(regdata == cause)
 
-    print(valarr)
+    valarr = valarr.T[[1, 2, 3, 4, 5, 0]]
+
+    # draw
+    fig, ax = plt.subplots()
+    im = ax.imshow(valarr)
+
+    # We want to show all ticks...
+    ax.set_xticks(np.arange(len(regions)))
+    ax.set_yticks(np.arange(len(causes)))
+    # ... and label them with the respective list entries
+    ax.set_xticklabels(regions)
+    ax.set_yticklabels(causes)
+
+    ax.set_title("Absolutně")
+    fig.tight_layout()
+    plt.show()
 
 
 # TODO pri spusteni zpracovat argumenty
