@@ -29,23 +29,27 @@ def plot_stat(data_source,
             valarr[i][cause] = np.count_nonzero(regdata == cause)
 
     valarr = valarr.T[[1, 2, 3, 4, 5, 0]]
+    valarr2 = (valarr.T / np.sum(valarr, axis=1)).T
 
     # draw
-    fig, ax = plt.subplots(sharex="all", sharey="all", figsize=(10, 3.8))
-    im = ax.imshow(valarr, norm=matplotlib.colors.LogNorm())
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex="all", sharey="all", figsize=(10, 8))
+    im1 = ax1.imshow(valarr, norm=matplotlib.colors.LogNorm())
+    im2 = ax2.imshow(valarr2)
 
     # Create colorbar
-    cbar = ax.figure.colorbar(im, ax=ax)
-    cbar.ax.set_ylabel("Počet nehod", rotation=-90, va="bottom")
+    cbar1 = ax1.figure.colorbar(im1, ax=ax1)
+    cbar1.ax.set_ylabel("Počet nehod", rotation=-90, va="bottom")
+    cbar2 = ax2.figure.colorbar(im2, ax=ax2)
+    cbar2.ax.set_ylabel("Počet nehod", rotation=-90, va="bottom")
 
     # We want to show all ticks...
-    ax.set_xticks(np.arange(len(regions)))
-    ax.set_yticks(np.arange(len(causes)))
+    ax1.set_xticks(np.arange(len(regions)))
+    ax1.set_yticks(np.arange(len(causes)))
     # ... and label them with the respective list entries
-    ax.set_xticklabels(regions)
-    ax.set_yticklabels(causes)
+    ax1.set_xticklabels(regions)
+    ax1.set_yticklabels(causes)
 
-    ax.set_title("Absolutně")
+    ax1.set_title("Absolutně")
     fig.tight_layout()
 
     if fig_location:
@@ -62,3 +66,4 @@ if __name__ == '__main__':
     data = dd.get_dict()
     # data = dd.get_dict(["KVK", "JHC", "PLK"])
     plot_stat(data, fig_location="/tmp/figs/fig1.png", show_figure=True)
+    # plot_stat(data)
