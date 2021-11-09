@@ -207,7 +207,7 @@ class DataDownloader:
         :param region: region to save
         :return: None
         """
-        with gzip.open(self._cache_filename.format(region), "wb") as file_gz:
+        with gzip.open(self._cache_filename.format(region), "wb", compresslevel=3) as file_gz:
             pickle.dump(self._cache_mem[region], file_gz)
 
     def _load_cache(self, region):
@@ -247,6 +247,7 @@ class DataDownloader:
 
 # TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
+    os.remove("data/data_KVK.pkl.gz")
     process = psutil.Process(os.getpid())
     print("MEM before", process.memory_info().rss / 1000000, "MB")
 
@@ -257,8 +258,8 @@ if __name__ == '__main__':
     #     bigdata.append(dd.parse_region_data(reg))
 
     # bigdata = dd.get_dict()
-    # bigdata = dd.get_dict(["ZLK"])
-    bigdata = dd.get_dict(["ZLK", "VYS"])
+    bigdata = dd.get_dict(["KVK"])
+    # bigdata = dd.get_dict(["ZLK", "VYS"])
 
     print("MEM after", process.memory_info().rss / 1000000, "MB")
 
