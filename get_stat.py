@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 
+import matplotlib.colors
 import numpy as np
 import matplotlib.pyplot as plt
 # povolene jsou pouze zakladni knihovny (os, sys) a knihovny numpy, matplotlib a argparse
@@ -29,13 +30,9 @@ def plot_stat(data_source,
 
     valarr = valarr.T[[1, 2, 3, 4, 5, 0]]
 
-    # log 10
-    with np.errstate(divide='ignore'):
-        valarr = np.log10(valarr)
-
     # draw
     fig, ax = plt.subplots(sharex="all", sharey="all", figsize=(10, 3.8))
-    im = ax.imshow(valarr)
+    im = ax.imshow(valarr, norm=matplotlib.colors.LogNorm())
 
     # Create colorbar
     cbar = ax.figure.colorbar(im, ax=ax)
