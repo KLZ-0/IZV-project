@@ -95,20 +95,6 @@ class DataDownloader:
         self._cache_filename = os.path.join(folder, cache_filename)
         self.type_map = dict(zip(self.headers, self.types))
 
-    def _decode_filename(self, filename):
-        """
-        Decodes the given datagis file name into month and year
-        :param filename: file name to be decoded
-        :return: tuple(month: str, year: str) or None if got utter trash
-        """
-        res = self._re_file_standard.match(filename)
-        if res is not None:
-            return res.groups()
-
-        res = self._re_file_december.match(filename)
-        if res is not None:
-            return "12", res.groups()[1]
-
     def _download_file_list(self):
         """
         Check for the existence of cached ZIP files in self._file_list and download them if necessary
