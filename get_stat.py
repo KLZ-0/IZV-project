@@ -26,6 +26,10 @@ def plot_stat(data_source,
 
     valarr = valarr.T[[1, 2, 3, 4, 5, 0]]
 
+    # log 10
+    with np.errstate(divide='ignore'):
+        valarr = np.log10(valarr)
+
     # draw
     fig, ax = plt.subplots()
     im = ax.imshow(valarr)
@@ -49,5 +53,6 @@ def plot_stat(data_source,
 # TODO pri spusteni zpracovat argumenty
 if __name__ == '__main__':
     dd = DataDownloader()
-    data = dd.get_dict(["KVK", "JHC", "PLK"])
+    data = dd.get_dict()
+    # data = dd.get_dict(["KVK", "JHC", "PLK"])
     plot_stat(data)
