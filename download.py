@@ -246,11 +246,9 @@ class DataDownloader:
         return dataset
 
 
-# TODO vypsat zakladni informace pri spusteni python3 download.py (ne pri importu modulu)
 if __name__ == '__main__':
     dd = DataDownloader()
-    bigdata = dd.get_dict()
-    # bigdata = dd.get_dict(["PHA"])
+    bigdata = dd.get_dict(["KVK", "JHC", "PLK"])
 
     print("Headers:", " ".join(bigdata.keys()))
     print("Number of records:", bigdata['p1'].shape[0])
