@@ -31,7 +31,7 @@ def plot_stat(data_source,
         valarr = np.log10(valarr)
 
     # draw
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(sharex="all", sharey="all", figsize=(10, 3.8))
     im = ax.imshow(valarr)
 
     # Create colorbar
