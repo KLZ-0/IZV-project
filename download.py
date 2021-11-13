@@ -72,10 +72,6 @@ class DataDownloader:
     _invalid_num_values = ["", "XX"] + [c + ":" for c in "ABDEFGHIL"]
     _invalid_num_replacement = -1
 
-    # regex for most files
-    _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
-    # regex for files which are supposed to be for december
-    _re_file_december = re.compile(r"data-?gis-?(rok)?-?(\d\d\d\d).*")
     # regex for valid end of year files
     _re_file_eoy = re.compile(r"data-?gis-?((rok)?-?(\d\d\d\d)|08-2021).*")
 
