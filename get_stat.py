@@ -18,8 +18,6 @@ def plot_stat(data_source,
               fig_location=None,
               show_figure=False):
 
-    # p24
-
     regions = np.unique(data_source["region"])
 
     valarr = np.ndarray((regions.shape[0], 6), dtype="i")
@@ -38,7 +36,7 @@ def plot_stat(data_source,
     im1 = ax1.imshow(valarr, norm=matplotlib.colors.LogNorm())
     im2 = ax2.imshow(valarr2, cmap="plasma")
 
-    # Create colorbar
+    # create colorbar
     cbar1 = ax1.figure.colorbar(im1, ax=ax1)
     cbar1.ax.set_ylabel("Počet nehod", rotation=90, va="top")
     cbar2 = ax2.figure.colorbar(im2, ax=ax2)
