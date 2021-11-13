@@ -76,6 +76,8 @@ class DataDownloader:
     _re_file_standard = re.compile(r"data-?gis-?(\d\d)-(\d\d\d\d).*")
     # regex for files which are supposed to be for december
     _re_file_december = re.compile(r"data-?gis-?(rok)?-?(\d\d\d\d).*")
+    # regex for valid end of year files
+    _re_file_eoy = re.compile(r"data-?gis-?((rok)?-?(\d\d\d\d)|08-2021).*")
 
     # List of ZIP files - cached so we don't have to request self._url each time
     _file_list = None
@@ -130,6 +132,7 @@ class DataDownloader:
 
         soup = BeautifulSoup(resp.text, features="html.parser")
         self._file_list = [button["onclick"].split("'")[1] for button in soup.findAll("button")]
+        self._file_list = [filename for filename in self._file_list if self._re_file_eoy.search(filename)]
 
         self._download_file_list()
 
