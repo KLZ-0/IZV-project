@@ -5,17 +5,13 @@ import gzip
 import io
 import os.path
 import pickle
-import sys
 import re
+import sys
 import urllib.parse
+import zipfile
 from pathlib import Path
 
 import numpy as np
-import zipfile
-
-# Kromě vestavěných knihoven (os, sys, re, requests …)
-# byste si měli vystačit s: gzip, pickle, csv, zipfile, numpy, matplotlib, BeautifulSoup.
-# Další knihovny je možné použít po schválení opravujícím (např ve fóru WIS).
 import requests
 from bs4 import BeautifulSoup
 

@@ -5,10 +5,8 @@ import os
 from pathlib import Path
 
 import matplotlib.colors
-import numpy as np
 import matplotlib.pyplot as plt
-# povolene jsou pouze zakladni knihovny (os, sys) a knihovny numpy, matplotlib a argparse
-from matplotlib import cm
+import numpy as np
 
 from download import DataDownloader
 
