@@ -111,7 +111,7 @@ class DataDownloader:
 
     def download_data(self):
         """
-        Scrap the provided URL for every downloadable ZIP data file
+        Scrap the provided URL for every downloadable ZIP data file and download them
         :return: None
         """
         Path(self._folder).mkdir(parents=True, exist_ok=True)
