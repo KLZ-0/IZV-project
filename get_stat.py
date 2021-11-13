@@ -28,6 +28,7 @@ def plot_stat(data_source,
         for cause in range(6):
             valarr[i][cause] = np.count_nonzero(regdata == cause)
 
+    # properly format the data
     valarr = valarr.T[[1, 2, 3, 4, 5, 0]]
     valarr2 = (valarr.T / np.sum(valarr, axis=1)).T * 100
     valarr2[valarr2 == 0] = np.nan
@@ -43,15 +44,17 @@ def plot_stat(data_source,
     cbar2 = ax2.figure.colorbar(im2, ax=ax2)
     cbar2.ax.set_ylabel("Podíl nehod pro danou příčinu [%]", rotation=90, va="top")
 
-    # We want to show all ticks...
+    # set ticks
     ax1.set_xticks(np.arange(len(regions)))
     ax1.set_yticks(np.arange(len(causes)))
-    # ... and label them with the respective list entries
     ax1.set_xticklabels(regions)
     ax1.set_yticklabels(causes)
 
+    # set titles
     ax1.set_title("Absolutně")
     ax2.set_title("Relativně vůči příčině")
+
+    # layout
     fig.tight_layout()
 
     if fig_location:
