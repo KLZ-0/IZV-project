@@ -23,8 +23,21 @@ Poznámka: zobrazujte na 1 desetinné místo (.1f) a počítejte, že 1 MB = 1e6
 """
 
 
+def _get_usage_mib(df: pd.DataFrame):
+    """
+    Returns the deep memory usage of the given dataframe in mebibytes
+    :param df:
+    :return:
+    """
+    return df.memory_usage(index=True, deep=True).sum() / (2 ** 20)
+
+
 def get_dataframe(filename: str, verbose: bool = False) -> pd.DataFrame:
     df = pd.read_pickle(filename)
+
+    if verbose:
+        print(f"orig_size={_get_usage_mib(df):.1f} MB")
+        
     return df
 
 
