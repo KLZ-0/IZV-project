@@ -22,6 +22,9 @@ new_size=X MB
 Poznámka: zobrazujte na 1 desetinné místo (.1f) a počítejte, že 1 MB = 1e6 B. 
 """
 
+# Columns to be converted into categories - could "o" be float?
+_category_cols = ["k", "p", "q", "t", "l", "i", "h"]
+
 
 def _get_usage_mib(df: pd.DataFrame):
     """
@@ -38,8 +41,14 @@ def get_dataframe(filename: str, verbose: bool = False) -> pd.DataFrame:
     if verbose:
         print(f"orig_size={_get_usage_mib(df):.1f} MB")
 
-    df.rename(columns={"p2a": "date"}, inplace=True)
-    df["date"] = pd.to_datetime(df["date"], cache=True)
+    # Make a date column
+    df["date"] = pd.to_datetime(df["p2a"], cache=True)
+
+    # Convert af few object columns to categories
+    df[_category_cols] = df[_category_cols].astype("category")
+
+    if verbose:
+        print(f"new_size={_get_usage_mib(df):.1f} MB")
 
     return df
 
