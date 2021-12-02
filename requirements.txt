@@ -2,3 +2,5 @@ numpy
 matplotlib
 requests
 beautifulsoup4
+pandas
+seaborn
