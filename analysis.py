@@ -37,7 +37,10 @@ def get_dataframe(filename: str, verbose: bool = False) -> pd.DataFrame:
 
     if verbose:
         print(f"orig_size={_get_usage_mib(df):.1f} MB")
-        
+
+    df.rename(columns={"p2a": "date"}, inplace=True)
+    df["date"] = pd.to_datetime(df["date"], cache=True)
+
     return df
 
 
