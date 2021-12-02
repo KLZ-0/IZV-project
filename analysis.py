@@ -36,13 +36,19 @@ _category_cols = ["k", "p", "q", "t", "l", "i", "h"]
 def _get_usage_mib(df: pd.DataFrame):
     """
     Returns the deep memory usage of the given dataframe in mebibytes
-    :param df:
+    :param df: dataframe to examine
     :return:
     """
     return df.memory_usage(index=True, deep=True).sum() / (2 ** 20)
 
 
 def get_dataframe(filename: str, verbose: bool = False) -> pd.DataFrame:
+    """
+    Load a dataframe from the given pickle file
+    :param filename: valid dataframe pickle - gz, bz2, zip, or xz compressed
+    :param verbose: print verbose information about the dataframe memory usage
+    :return: the loaded dataframe
+    """
     df = pd.read_pickle(filename)
 
     if verbose:
