@@ -4,7 +4,7 @@
 
 # Results
 
-The project is evaluared in 3 separate parts
+The project is evaluated in 3 separate parts
 
 ## Part 1
 
