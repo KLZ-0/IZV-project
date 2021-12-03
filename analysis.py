@@ -79,7 +79,7 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
               "vícepruhová", "rychlostní komunikace"]
 
     # subplots
-    fig, ax = plt.subplots(nrows=2, ncols=3, sharex="all", figsize=(10, 6))
+    fig, ax = plt.subplots(nrows=2, ncols=3, sharex="all", figsize=(10, 6.5))
 
     # reorganize the subplots
     ax = np.roll(ax.reshape(6), 1)
@@ -101,6 +101,8 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
         ax[i].set_title(label)
         ax[i].set_xlabel("Kraj")
         ax[i].set_ylabel("Počet nehod")
+
+    plt.suptitle("Druhy silnic")
 
     # layout
     fig.tight_layout()
