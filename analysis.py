@@ -83,12 +83,11 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
 
     # setup plots
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(10, 6.5))
+    # reorganize the subplots
+    ax = np.roll(ax.reshape(6), 1)
 
     # remove top and right spines
     sns.despine()
-
-    # reorganize the subplots
-    ax = np.roll(ax.reshape(6), 1)
 
     # categorize and label the p21 column
     df["road_type"] = pd.cut(df["p21"], [-1, 0, 1, 2, 4, 5, 6], labels=labels)
@@ -99,6 +98,8 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     # group and count
     data = data.groupby(["road_type", "region"]).agg(
         {"p1": "count"}).reset_index()
+
+    # TODO: do this with a figure-level function
 
     # create plot for each communication type
     for i, label in enumerate(labels):
@@ -176,7 +177,53 @@ def plot_animals(df: pd.DataFrame, fig_location: str = None,
 # Ukol 4: Povětrnostní podmínky
 def plot_conditions(df: pd.DataFrame, fig_location: str = None,
                     show_figure: bool = False):
-    pass
+    # static things
+    selected_regions = ["JHM", "JHC", "PLK", "ULK"]
+    labels = ["Nesťažené", "Hmla", "Na počiatku dažďa", "Dážď",
+              "Sneženie", "Tvorí sa námraza", "Nárazový vietor"]
+
+    # set background for subplots
+    sns.set_style("darkgrid")
+
+    # setup plots
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 6.5))
+    # reorganize the subplots
+    ax = np.roll(ax.reshape(4), 1)
+
+    # remove top and right spines
+    sns.despine(top=True, bottom=True, left=True, right=True)
+
+    # make new column
+    df["weather"] = df["p18"]
+
+    # categorize and label the causes
+    df["weather"] = pd.cut(df["weather"], [i for i in range(8)],
+                           labels=labels)
+
+    # select regions and consider only years before 2021
+    data = df[
+        df["region"].isin(selected_regions) & (df["p18"] != 0)]
+
+    # group and count
+    # data = data.groupby(["region", "weather"]).agg(
+    #     {"p1": "count"}).reset_index()
+
+    data = pd.pivot_table(data, columns=["weather"], values="p1",
+                          index=["region", "date"], aggfunc="count")
+    print(data)
+    print("--------")
+    # print(data["Nesťažené"]["JHC"])
+    for i, region in enumerate(selected_regions):
+        tmp = data.loc[region].resample("M").sum()
+        tmp = tmp.stack(level="weather").reset_index()
+        sns.lineplot(data=tmp, x="date", y=0, hue="weather", ax=ax[i])
+
+    if fig_location:
+        Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(fig_location)
+
+    if show_figure:
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -187,6 +234,6 @@ if __name__ == "__main__":
     # tento soubor si stahnete sami, při testování pro hodnocení bude existovat
     accidents_df = get_dataframe("accidents.pkl.gz")
     # plot_roadtype(accidents_df, fig_location="01_roadtype.png",
-    #               show_figure=False)
-    plot_animals(accidents_df, "02_animals.png", True)
+    #               show_figure=True)
+    # plot_animals(accidents_df, "02_animals.png", True)
     plot_conditions(accidents_df, "03_conditions.png", True)
