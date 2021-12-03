@@ -105,8 +105,8 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
         sns.barplot(data=data[data["road_type"] == label], x="region",
                     y="p1", ax=ax[i], color=sns.color_palette()[i - 1])
         ax[i].set_title(label)
-        ax[i].set_xlabel("")
-        ax[i].set_ylabel("")
+        ax[i].set_xlabel("Kraj")
+        ax[i].set_ylabel("Počet nehôd")
         # ax[i].set_facecolor("grey")
 
     plt.suptitle("Počet nehôd podľa druhu cesty")
@@ -125,7 +125,58 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
 # Ukol3: zavinění zvěří
 def plot_animals(df: pd.DataFrame, fig_location: str = None,
                  show_figure: bool = False):
-    pass
+    # static things
+    selected_regions = ["JHM", "JHC", "PLK", "ULK"]
+    labels = ["Vodičom", "Zverou", "Iné"]
+
+    # set background for subplots
+    sns.set_style("darkgrid")
+
+    # remove top and right spines
+    sns.despine(top=True, bottom=True, left=True, right=True)
+
+    # make new column
+    df["cause"] = df["p10"]
+
+    # remap cause pedestrians from 3 -> 8 so we can use category intervals
+    df.loc[df["cause"] == 3, "cause"] = 8
+
+    # categorize and label the causes
+    df["cause"] = pd.cut(df["cause"], [-1, 2, 4, 10], labels=labels)
+
+    # select regions and consider only years before 2021
+    data = df[
+        df["region"].isin(selected_regions) & (df["date"].dt.year < 2021)]
+
+    # group and count
+    data = data.groupby(["region", data.date.dt.month, "cause"]).agg(
+        {"p1": "count"}).reset_index()
+
+    # for i, region in enumerate(selected_regions):
+    #     sns.barplot(data=data[data["region"] == region], x="date",
+    #                 y="p1", ax=ax[i], hue="cause")
+    #     ax[i].set_title(f"Kraj: {region}")
+    #     ax[i].set_xlabel("Mesiac")
+    #     ax[i].set_ylabel("Počet nehôd")
+
+    s = sns.catplot(data=data, x="date", y="p1",
+                    hue="cause", col="region",
+                    col_wrap=2, kind="bar",
+                    height=2.5, aspect=1.4,
+                    legend=True, legend_out=True,
+                    sharey=False, sharex=False)
+
+    s.set_titles("Kraj: {col_name}")
+    s.set_xlabels("Mesiac")
+    s.set_ylabels("Počet nehôd")
+    s.legend.set(title="Zavinenie")
+
+    if fig_location:
+        Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(fig_location)
+
+    if show_figure:
+        plt.show()
 
 
 # Ukol 4: Povětrnostní podmínky
@@ -141,7 +192,7 @@ if __name__ == "__main__":
 
     # tento soubor si stahnete sami, při testování pro hodnocení bude existovat
     accidents_df = get_dataframe("accidents.pkl.gz")
-    plot_roadtype(accidents_df, fig_location="01_roadtype.png",
-                  show_figure=True)
+    # plot_roadtype(accidents_df, fig_location="01_roadtype.png",
+    #               show_figure=False)
     plot_animals(accidents_df, "02_animals.png", True)
     plot_conditions(accidents_df, "03_conditions.png", True)
