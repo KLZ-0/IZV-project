@@ -74,9 +74,9 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
                   show_figure: bool = False):
     # static things
     selected_regions = ["JHM", "JHC", "PLK", "ULK"]
-    labels = ["žádná z uvedených", "dvoupruhová",
-              "třípruhová", "čtyřpruhová",
-              "vícepruhová", "rychlostní komunikace"]
+    labels = ["Žiadna z uvedených", "Dvojpruhová",
+              "Trojpruhová", "Štvorpruhová",
+              "Viacpruhová", "Rýchlostná cesta"]
 
     # subplots
     fig, ax = plt.subplots(nrows=2, ncols=3, sharex="all", figsize=(10, 6.5))
@@ -100,9 +100,9 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
                     y="p1", ax=ax[i])
         ax[i].set_title(label)
         ax[i].set_xlabel("Kraj")
-        ax[i].set_ylabel("Počet nehod")
+        ax[i].set_ylabel("Počet nehôd")
 
-    plt.suptitle("Druhy silnic")
+    plt.suptitle("Počet nehôd v závislosti od druhu cesty")
 
     # layout
     fig.tight_layout()
