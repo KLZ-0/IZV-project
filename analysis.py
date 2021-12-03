@@ -78,8 +78,14 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
               "Trojpruhová", "Štvorpruhová",
               "Viacpruhová", "Rýchlostná cesta"]
 
-    # subplots
-    fig, ax = plt.subplots(nrows=2, ncols=3, sharex="all", figsize=(10, 6.5))
+    # set background for subplots
+    sns.set_style("whitegrid")
+
+    # setup plots
+    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(10, 6.5))
+
+    # remove top and right spines
+    sns.despine()
 
     # reorganize the subplots
     ax = np.roll(ax.reshape(6), 1)
@@ -97,10 +103,11 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     # create plot for each communication type
     for i, label in enumerate(labels):
         sns.barplot(data=data[data["road_type"] == label], x="region",
-                    y="p1", ax=ax[i])
+                    y="p1", ax=ax[i], color=sns.color_palette()[i - 1])
         ax[i].set_title(label)
-        ax[i].set_xlabel("Kraj")
-        ax[i].set_ylabel("Počet nehôd")
+        ax[i].set_xlabel("")
+        ax[i].set_ylabel("")
+        # ax[i].set_facecolor("grey")
 
     plt.suptitle("Počet nehôd podľa druhu cesty")
 
