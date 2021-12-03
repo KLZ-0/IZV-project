@@ -99,8 +99,8 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
         sns.barplot(data=data[data["road_type"] == label], x="region",
                     y="p1", ax=ax[i])
         ax[i].set_title(label)
-        ax[i].set_xlabel("Kraj")
-        ax[i].set_ylabel("Počet nehod")
+        ax[i].set_xlabel("Kraj" if i >= 3 else "")
+        ax[i].set_ylabel("Počet nehod" if i % 3 == 1 else "")
 
     plt.suptitle("Druhy silnic")
 
