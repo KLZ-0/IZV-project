@@ -1,5 +1,7 @@
 #!/usr/bin/env python3.9
 # coding=utf-8
+from pathlib import Path
+
 from matplotlib import pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -70,8 +72,45 @@ def get_dataframe(filename: str, verbose: bool = False) -> pd.DataFrame:
 
 def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
                   show_figure: bool = False):
+    # static things
+    selected_regions = ["JHM", "JHC", "PLK", "ULK"]
+    labels = ["žádná z uvedených", "dvoupruhová",
+              "třípruhová", "čtyřpruhová",
+              "vícepruhová", "rychlostní komunikace"]
 
-    pass
+    # subplots
+    fig, ax = plt.subplots(nrows=2, ncols=3, sharex="all", figsize=(10, 6))
+
+    # reorganize the subplots
+    ax = np.roll(ax.reshape(6), 1)
+
+    # categorize and label the p21 column
+    df["road_type"] = pd.cut(df["p21"], [-1, 0, 1, 2, 4, 5, 6], labels=labels)
+
+    # select regions
+    data = df[df["region"].isin(selected_regions)]
+
+    # group and count
+    data = data.groupby(["road_type", "region"]).agg(
+        {"p1": "count"}).reset_index()
+
+    # create plot for each communication type
+    for i, label in enumerate(labels):
+        sns.barplot(data=data[data["road_type"] == label], x="region",
+                    y="p1", ax=ax[i])
+        ax[i].set_title(label)
+        ax[i].set_xlabel("Kraj")
+        ax[i].set_ylabel("Počet nehod")
+
+    # layout
+    fig.tight_layout()
+
+    if fig_location:
+        Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(fig_location)
+
+    if show_figure:
+        plt.show()
 
 
 # Ukol3: zavinění zvěří
