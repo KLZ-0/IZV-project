@@ -102,7 +102,7 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
         ax[i].set_xlabel("Kraj")
         ax[i].set_ylabel("Počet nehôd")
 
-    plt.suptitle("Počet nehôd v závislosti od druhu cesty")
+    plt.suptitle("Počet nehôd podľa druhu cesty")
 
     # layout
     fig.tight_layout()
