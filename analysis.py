@@ -152,13 +152,7 @@ def plot_animals(df: pd.DataFrame, fig_location: str = None,
     data = data.groupby(["region", data.date.dt.month, "cause"]).agg(
         {"p1": "count"}).reset_index()
 
-    # for i, region in enumerate(selected_regions):
-    #     sns.barplot(data=data[data["region"] == region], x="date",
-    #                 y="p1", ax=ax[i], hue="cause")
-    #     ax[i].set_title(f"Kraj: {region}")
-    #     ax[i].set_xlabel("Mesiac")
-    #     ax[i].set_ylabel("Počet nehôd")
-
+    # plot
     s = sns.catplot(data=data, x="date", y="p1",
                     hue="cause", col="region",
                     col_wrap=2, kind="bar",
