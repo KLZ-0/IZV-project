@@ -79,7 +79,7 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
               "Viacpruhová", "Rýchlostná cesta"]
 
     # set background for subplots
-    sns.set_style("whitegrid")
+    sns.set_style("darkgrid")
 
     # setup plots
     fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(10, 6.5))
@@ -132,7 +132,7 @@ def plot_animals(df: pd.DataFrame, fig_location: str = None,
     # set background for subplots
     sns.set_style("darkgrid")
 
-    # remove top and right spines
+    # remove spines
     sns.despine(top=True, bottom=True, left=True, right=True)
 
     # make new column
