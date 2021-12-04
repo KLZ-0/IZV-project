@@ -2,6 +2,7 @@
 # coding=utf-8
 from pathlib import Path
 
+import matplotlib.colors
 from matplotlib import pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -77,14 +78,10 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     labels = ["Žiadna z uvedených", "Dvojpruhová",
               "Trojpruhová", "Štvorpruhová",
               "Viacpruhová", "Rýchlostná cesta"]
+    labels_order = labels[1:] + labels[:1]
 
     # set background for subplots
     sns.set_style("darkgrid")
-
-    # setup plots
-    fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(10, 6.5))
-    # reorganize the subplots
-    ax = np.roll(ax.reshape(6), 1)
 
     # remove top and right spines
     sns.despine()
@@ -99,21 +96,20 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     data = data.groupby(["road_type", "region"]).agg(
         {"p1": "count"}).reset_index()
 
-    # TODO: do this with a figure-level function
-
-    # create plot for each communication type
-    for i, label in enumerate(labels):
-        sns.barplot(data=data[data["road_type"] == label], x="region",
-                    y="p1", ax=ax[i], color=sns.color_palette()[i - 1])
-        ax[i].set_title(label)
-        ax[i].set_xlabel("Kraj")
-        ax[i].set_ylabel("Počet nehôd")
-        # ax[i].set_facecolor("grey")
+    # plot
+    s = sns.catplot(data=data, x="region", y="p1",
+                    col="road_type",
+                    col_wrap=3, kind="bar",
+                    height=2.5, aspect=1.2,
+                    legend=False, col_order=labels_order,
+                    hue="road_type", dodge=False,
+                    sharey=False, sharex=False)
 
     plt.suptitle("Počet nehôd podľa druhu cesty")
-
-    # layout
-    fig.tight_layout()
+    s.set_titles("{col_name}")
+    s.set_xlabels("Kraj")
+    s.set_ylabels("Počet nehôd")
+    s.tight_layout()
 
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
@@ -249,7 +245,7 @@ if __name__ == "__main__":
 
     # tento soubor si stahnete sami, při testování pro hodnocení bude existovat
     accidents_df = get_dataframe("accidents.pkl.gz")
-    # plot_roadtype(accidents_df, fig_location="01_roadtype.png",
-    #               show_figure=True)
-    plot_animals(accidents_df, "02_animals.png", True)
-    plot_conditions(accidents_df, "03_conditions.png", True)
+    plot_roadtype(accidents_df, fig_location="01_roadtype.png",
+                  show_figure=True)
+    # plot_animals(accidents_df, "02_animals.png", True)
+    # plot_conditions(accidents_df, "03_conditions.png", True)
