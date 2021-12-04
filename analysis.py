@@ -100,7 +100,7 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     s = sns.catplot(data=data, x="region", y="p1",
                     col="road_type",
                     col_wrap=3, kind="bar",
-                    height=2.5, aspect=1.2, legend=False,
+                    height=2.5, aspect=1.15, legend=False,
                     col_order=labels_order, hue_order=labels_order,
                     hue="road_type", dodge=False,
                     sharey=False, sharex=False)
@@ -247,5 +247,5 @@ if __name__ == "__main__":
     accidents_df = get_dataframe("accidents.pkl.gz")
     plot_roadtype(accidents_df, fig_location="01_roadtype.png",
                   show_figure=True)
-    # plot_animals(accidents_df, "02_animals.png", True)
-    # plot_conditions(accidents_df, "03_conditions.png", True)
+    plot_animals(accidents_df, "02_animals.png", True)
+    plot_conditions(accidents_df, "03_conditions.png", True)
