@@ -193,7 +193,7 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
     data = pd.pivot_table(data, columns=["weather"], values="p1",
                           index=["region", "date"], aggfunc="count")
 
-    # unstack region to match the desired index in the next step
+    # rearrange index to match the desired index in the next step
     target = data.stack(level="weather").unstack(level="region")
 
     # resample for every region and store in the target dataframe
@@ -202,9 +202,8 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
         target[region] = tmp.stack(level="weather")
 
     # drop nans, stack the region and reset the index to expand the dataframe
-    target = target.dropna(how='all')
-    target = target.stack(level="region")
-    target = target.reset_index()
+    target.dropna(how='all', inplace=True)
+    target = target.stack(level="region").reset_index()
 
     # plot
     s = sns.relplot(data=target, x="date", y=0,
