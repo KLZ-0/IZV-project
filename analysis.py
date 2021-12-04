@@ -14,7 +14,7 @@ def _get_usage_mib(df: pd.DataFrame):
     """
     Returns the deep memory usage of the given dataframe in mebibytes
     :param df: dataframe to examine
-    :return:
+    :return: None
     """
     return df.memory_usage(index=True, deep=True).sum() / (2 ** 20)
 
@@ -45,6 +45,13 @@ def get_dataframe(filename: str, verbose: bool = False) -> pd.DataFrame:
 
 def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
                   show_figure: bool = False):
+    """
+    Plot accidents by road type in 4 selected regions
+    :param df: dataframe to examine
+    :param fig_location: file name where the figure should be saved
+    :param show_figure: if True shows the figure at runtime
+    :return: None
+    """
     # static things
     selected_regions = ["JHM", "JHC", "PLK", "ULK"]
     labels = ["Žiadna z uvedených", "Dvojpruhová",
@@ -93,6 +100,13 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
 
 def plot_animals(df: pd.DataFrame, fig_location: str = None,
                  show_figure: bool = False):
+    """
+    Plot causes for each month in 4 selected regions
+    :param df: dataframe to examine
+    :param fig_location: file name where the figure should be saved
+    :param show_figure: if True shows the figure at runtime
+    :return: None
+    """
     # static things
     selected_regions = ["JHM", "JHC", "PLK", "ULK"]
     labels = ["Vodičom", "Zverou", "Iné"]
@@ -144,6 +158,13 @@ def plot_animals(df: pd.DataFrame, fig_location: str = None,
 
 def plot_conditions(df: pd.DataFrame, fig_location: str = None,
                     show_figure: bool = False):
+    """
+    Plot conditions during each month in 4 selected regions
+    :param df: dataframe to examine
+    :param fig_location: file name where the figure should be saved
+    :param show_figure: if True shows the figure at runtime
+    :return: None
+    """
     # static things
     selected_regions = ["JHM", "JHC", "PLK", "ULK"]
     labels = ["Nesťažené", "Hmla", "Na počiatku dažďa", "Dážď",
