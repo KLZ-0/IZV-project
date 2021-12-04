@@ -186,9 +186,9 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
     sns.set_style("darkgrid")
 
     # setup plots
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 6.5))
+    # fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 6.5))
     # reorganize the subplots
-    ax = np.roll(ax.reshape(4), 1)
+    # ax = np.roll(ax.reshape(4), 1)
 
     # remove top and right spines
     sns.despine(top=True, bottom=True, left=True, right=True)
@@ -201,8 +201,9 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
                            labels=labels)
 
     # select regions and consider only years before 2021
-    data = df[
-        df["region"].isin(selected_regions) & (df["p18"] != 0)]
+    data = df[df["region"].isin(selected_regions)
+              & (df["p18"] != 0)
+              & (df["date"].dt.year < 2021)]
 
     # group and count
     # data = data.groupby(["region", "weather"]).agg(
@@ -212,11 +213,43 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
                           index=["region", "date"], aggfunc="count")
     print(data)
     print("--------")
-    # print(data["Nesťažené"]["JHC"])
+
+    target = data.stack(level="weather").unstack(level="region")
+    # target = {}
     for i, region in enumerate(selected_regions):
         tmp = data.loc[region].resample("M").sum()
-        tmp = tmp.stack(level="weather").reset_index()
-        sns.lineplot(data=tmp, x="date", y=0, hue="weather", ax=ax[i])
+        tmp = tmp.stack(level="weather")
+        # tmp2 = tmp.reset_index()
+        # print(target.loc[region, tmp.index.levels[0], tmp.index.levels[1]])
+        # exit()
+        # target.loc[region, tmp.index] = tmp
+        # reg = target.loc[region, tmp.index.levels[0]]
+        # print(reg[tmp.index].)
+
+        # print(len(target.loc[region, tmp.index.levels[0]]))
+        # print(len(tmp))
+
+        # target.loc[region, tmp.index.levels[0], tmp.index.levels[1]] = tmp[0]
+        # exit()
+
+        # arr = target[(target["region"] == "JHM")]
+
+        target[region] = tmp
+
+        # target[region] = tmp
+
+    target = target.dropna(how='all')
+    target = target.stack(level="region")
+    target = target.reset_index()
+    # target = target.stack(level="region")
+    # target = target.reset_index()
+
+    print(target)
+
+    sns.relplot(data=target, x="date", y=0,
+                hue="weather", col="region",
+                col_wrap=2, kind="line",
+                height=2.5, aspect=1.4)
 
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
