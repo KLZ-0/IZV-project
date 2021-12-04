@@ -133,13 +133,13 @@ def plot_animals(df: pd.DataFrame, fig_location: str = None,
     # set background for subplots
     sns.set_style("darkgrid")
 
-    # remove spines
+    # remove all spines
     sns.despine(top=True, bottom=True, left=True, right=True)
 
     # make new column
     df["cause"] = df["p10"]
 
-    # remap cause pedestrians from 3 -> 8 so we can use category intervals
+    # remap "pedestrians" cause from 3 -> 8 so we can use category intervals
     df.loc[df["cause"] == 3, "cause"] = 8
 
     # categorize and label the causes
@@ -186,17 +186,18 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
     # set background for subplots
     sns.set_style("darkgrid")
 
-    # remove top and right spines
+    # remove all spines
     sns.despine(top=True, bottom=True, left=True, right=True)
 
     # make new column
     df["weather"] = df["p18"]
 
-    # categorize and label the causes
+    # categorize and label the weather
     df["weather"] = pd.cut(df["weather"], [i for i in range(8)],
                            labels=labels)
 
-    # select regions and consider only years before 2021
+    # select regions, drop rows with "other" weather condition
+    # and consider only years before 2021
     data = df[df["region"].isin(selected_regions)
               & (df["p18"] != 0)
               & (df["date"].dt.year < 2021)]
@@ -205,15 +206,15 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
     data = pd.pivot_table(data, columns=["weather"], values="p1",
                           index=["region", "date"], aggfunc="count")
 
-    # make unstack region to match the desired index in the next step
+    # unstack region to match the desired index in the next step
     target = data.stack(level="weather").unstack(level="region")
 
-    # resample for every region and store in the target df
+    # resample for every region and store in the target dataframe
     for i, region in enumerate(selected_regions):
         tmp = data.loc[region].resample("M").sum()
         target[region] = tmp.stack(level="weather")
 
-    # drop nans, stack the region and reset te index to expand the dataframe
+    # drop nans, stack the region and reset the index to expand the dataframe
     target = target.dropna(how='all')
     target = target.stack(level="region")
     target = target.reset_index()
