@@ -185,11 +185,6 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
     # set background for subplots
     sns.set_style("darkgrid")
 
-    # setup plots
-    # fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 6.5))
-    # reorganize the subplots
-    # ax = np.roll(ax.reshape(4), 1)
-
     # remove top and right spines
     sns.despine(top=True, bottom=True, left=True, right=True)
 
@@ -205,47 +200,24 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
               & (df["p18"] != 0)
               & (df["date"].dt.year < 2021)]
 
-    # group and count
-    # data = data.groupby(["region", "weather"]).agg(
-    #     {"p1": "count"}).reset_index()
-
+    # make a pivot table
     data = pd.pivot_table(data, columns=["weather"], values="p1",
                           index=["region", "date"], aggfunc="count")
-    print(data)
-    print("--------")
 
+    # make unstack region to match the desired index in the next step
     target = data.stack(level="weather").unstack(level="region")
-    # target = {}
+
+    # resample for every region and store in the target df
     for i, region in enumerate(selected_regions):
         tmp = data.loc[region].resample("M").sum()
-        tmp = tmp.stack(level="weather")
-        # tmp2 = tmp.reset_index()
-        # print(target.loc[region, tmp.index.levels[0], tmp.index.levels[1]])
-        # exit()
-        # target.loc[region, tmp.index] = tmp
-        # reg = target.loc[region, tmp.index.levels[0]]
-        # print(reg[tmp.index].)
+        target[region] = tmp.stack(level="weather")
 
-        # print(len(target.loc[region, tmp.index.levels[0]]))
-        # print(len(tmp))
-
-        # target.loc[region, tmp.index.levels[0], tmp.index.levels[1]] = tmp[0]
-        # exit()
-
-        # arr = target[(target["region"] == "JHM")]
-
-        target[region] = tmp
-
-        # target[region] = tmp
-
+    # drop nans, stack the region and reset te index to expand the dataframe
     target = target.dropna(how='all')
     target = target.stack(level="region")
     target = target.reset_index()
-    # target = target.stack(level="region")
-    # target = target.reset_index()
 
-    print(target)
-
+    # plot
     sns.relplot(data=target, x="date", y=0,
                 hue="weather", col="region",
                 col_wrap=2, kind="line",
