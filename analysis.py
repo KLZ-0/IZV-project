@@ -230,7 +230,7 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
 
 
 if __name__ == "__main__":
-    accidents_df = get_dataframe("accidents.pkl.gz")
+    accidents_df = get_dataframe("accidents.pkl.gz", verbose=True)
     plot_roadtype(accidents_df, fig_location="01_roadtype.png",
                   show_figure=True)
     plot_animals(accidents_df, "02_animals.png", True)
