@@ -218,10 +218,19 @@ def plot_conditions(df: pd.DataFrame, fig_location: str = None,
     target = target.reset_index()
 
     # plot
-    sns.relplot(data=target, x="date", y=0,
-                hue="weather", col="region",
-                col_wrap=2, kind="line",
-                height=2.5, aspect=1.4)
+    s = sns.relplot(data=target, x="date", y=0,
+                    hue="weather", col="region",
+                    col_wrap=2, kind="line",
+                    height=2.5, aspect=1.4)
+
+    s.set_titles("Kraj: {col_name}")
+    s.set_xlabels("")
+    s.set_ylabels("Počet nehôd")
+    s.legend.set(title="Podmienky")
+    s.set(xmargin=0)
+    s.set(xticks=[f"20{year}-01" for year in range(16, 22)])
+    s.set_xticklabels([f"01/{year}" for year in range(16, 22)])
+    s.tight_layout()
 
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
