@@ -86,7 +86,7 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     # remove top and right spines
     sns.despine()
 
-    # categorize and label the p21 column
+    # categorize and label the road types
     df["road_type"] = pd.cut(df["p21"], [-1, 0, 1, 2, 4, 5, 6], labels=labels)
 
     # select regions
@@ -100,8 +100,8 @@ def plot_roadtype(df: pd.DataFrame, fig_location: str = None,
     s = sns.catplot(data=data, x="region", y="p1",
                     col="road_type",
                     col_wrap=3, kind="bar",
-                    height=2.5, aspect=1.2,
-                    legend=False, col_order=labels_order,
+                    height=2.5, aspect=1.2, legend=False,
+                    col_order=labels_order, hue_order=labels_order,
                     hue="road_type", dodge=False,
                     sharey=False, sharex=False)
 
