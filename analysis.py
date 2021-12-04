@@ -165,6 +165,7 @@ def plot_animals(df: pd.DataFrame, fig_location: str = None,
     s.set_xlabels("Mesiac")
     s.set_ylabels("Počet nehôd")
     s.legend.set(title="Zavinenie")
+    s.tight_layout()
 
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
@@ -249,5 +250,5 @@ if __name__ == "__main__":
     accidents_df = get_dataframe("accidents.pkl.gz")
     # plot_roadtype(accidents_df, fig_location="01_roadtype.png",
     #               show_figure=True)
-    # plot_animals(accidents_df, "02_animals.png", True)
+    plot_animals(accidents_df, "02_animals.png", True)
     plot_conditions(accidents_df, "03_conditions.png", True)
