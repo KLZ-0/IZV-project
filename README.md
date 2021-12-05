@@ -1,6 +1,6 @@
-# Project from Data Analysis and Visualization in Python (IZV)
+# Data Analysis and Visualization in Python (IZV)
 
-*Academic year 2021/2022*
+*Project for the academic year 2021/2022*
 
 # Results
 
