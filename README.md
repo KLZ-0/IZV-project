@@ -6,7 +6,7 @@
 
 The project is evaluated in 3 separate parts
 
-## Part 1
+## [Part 1](/zadani1.pdf)
 
 Contents:
 
@@ -38,4 +38,40 @@ Komentar k hodnoceni
 takto jsem si ten kod prestavoval.
 Dokonce odpustim i to, ze cbar nema definovane krajove
 hodnoty :-)
+```
+
+## [Part 2](/zadani2.pdf)
+
+Contents:
+
+- [analysis.py](/analysis.py)
+
+Rating (19/20):
+
+```
+Hodnoceni druhe casti projektu: xkalaz00
+================================================================================
++1.00 pouzite kategoricke typy (>=2) (az 1 bodu)
++1.00 ostatni typy jsou korektni (ints>30 & floats>=6) (az 1 bodu)
++1.00 vhodne vyuziti pameti (< 500 MB) (az 1 bodu)
++1.00 spravne konvertovane datum (rok 2016 - 2021) (az 1 bodu)
++0.12 funkce get_dataframe ma spravne docstring (PEP257) (az 0.125 bodu)
++0.12 funkce plot_roadtype ma spravne docstring (PEP257) (az 0.125 bodu)
++0.12 funkce plot_animals ma spravne docstring (PEP257) (az 0.125 bodu)
++0.12 funkce plot_conditions ma spravne docstring (PEP257) (az 0.125 bodu)
++0.50 funkce plot_conditions trva do 1500 ms (az 0.5 bodu)
++2.00 kvalita kodu funkce plot_conditions (az 2 bodu)
++2.00 vizualni dojem z grafu plot_conditions (az 2 bodu)
++0.50 funkce plot_animals trva do 1200 ms (az 0.5 bodu)
++1.00 kvalita kodu funkce plot_animals (az 2 bodu)
++2.00 vizualni dojem z grafu plot_animals (az 2 bodu)
++0.50 funkce plot_roadtype trva do 1000 ms (az 0.5 bodu)
++2.00 kvalita kodu funkce plot_roadtype (az 2 bodu)
++2.00 vizualni dojem z grafu plot_roadtype (az 2 bodu)
++2.00 kvalita kodu dle PEP8 (0 kritickych, 0 E2.., 0 E7..)) (az 2 bodu)
+CELKEM: 19.0 bodu
+
+Komentar k hodnoceni (zejmena k vizualizacim)
+================================================================================
+v poradku, jen animals nejsou filtrovane dle p58
 ```
