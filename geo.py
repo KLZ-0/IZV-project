@@ -16,7 +16,18 @@ def make_geo(df: pd.DataFrame) -> geopandas.GeoDataFrame:
     Konvertovani dataframe
     do geopandas.GeoDataFrame se spravnym kodovani
     """
-    pass
+    # Remove rows without location
+    df = df[(df["d"] != np.nan) & (df["e"] != np.nan)]
+
+    # Make a date column
+    df["date"] = pd.to_datetime(df["p2a"], cache=True)
+
+    # Convert af few object columns to categories
+    _category_cols = ["k", "p", "q", "t", "l", "i", "h"]
+    df[_category_cols] = df[_category_cols].astype("category")
+
+    # transform to GeoDataFrame
+    return geopandas.GeoDataFrame(df, geometry=geopandas.points_from_xy(df["d"], df["e"]), crs="EPSG:5514")
 
 
 def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
