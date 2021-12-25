@@ -1,14 +1,14 @@
 #!/usr/bin/python3.8
 # coding=utf-8
+import tempfile
+from pathlib import Path
+
 import pandas as pd
 import geopandas
 import matplotlib.pyplot as plt
-import contextily
+import contextily as ctx
 import sklearn.cluster
 import numpy as np
-
-
-# muzete pridat vlastni knihovny
 
 
 def make_geo(df: pd.DataFrame) -> geopandas.GeoDataFrame:
@@ -36,7 +36,44 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     Vykresleni grafu s sesti podgrafy podle lokality nehody
      (dalnice vs prvni trida) pro roky 2018-2020
      """
-    pass
+    # Static things
+    colors = ["green", "red"]
+    roadtypes = ["dialnice", "cesty prvej triedy"]
+    chosen_region = "JHM"
+    title_str = chosen_region + " kraj: {road_type} ({year})"
+
+    # Subplots
+    fig, ax = plt.subplots(3, 2, figsize=(8.27, 11.69))
+
+    # filter region and transform to webmercator
+    data = gdf[gdf["region"] == chosen_region].to_crs("EPSG:3857")
+
+    # filter to only the data we need
+    # this is also needed to determine the envelope for the maps
+    data = data[data["date"].dt.year.isin([2018, 2019, 2020]) & data["p36"].isin([0, 1])]
+
+    # Save the map using the whole boundary -> same map for each subplot
+    mapfile = tempfile.NamedTemporaryFile()
+    ctx.bounds2raster(*data.total_bounds, path=mapfile.name, source=ctx.providers.Stamen.TonerLite)
+
+    for i, ax_year in enumerate(ax):
+        target_year = 2018 + i
+        bitmap_year = data["date"].dt.year == target_year
+
+        for u, ax_roadtype in enumerate(ax_year):
+            ax_roadtype.set_axis_off()
+            data[bitmap_year & (data["p36"] == u)].plot(ax=ax_roadtype, markersize=1, color=colors[u])
+            ctx.add_basemap(ax_roadtype, crs=data.crs.to_string(), alpha=0.9,
+                            reset_extent=False, source=mapfile.name)
+            ctx.add_attribution(ax_roadtype, ctx.providers.Stamen.TonerLite.attribution, font_size=6)
+            ax_roadtype.set_title(title_str.format(road_type=roadtypes[u], year=target_year), fontsize="small")
+
+    if fig_location:
+        Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(fig_location)
+
+    if show_figure:
+        plt.show()
 
 
 def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
