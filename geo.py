@@ -17,7 +17,7 @@ def make_geo(df: pd.DataFrame) -> geopandas.GeoDataFrame:
     do geopandas.GeoDataFrame se spravnym kodovani
     """
     # Remove rows without location
-    df = df[(df["d"] != np.nan) & (df["e"] != np.nan)]
+    df = df[(df["d"].notna()) & (df["e"].notna())]
 
     # Make a date column
     df["date"] = pd.to_datetime(df["p2a"], cache=True)
