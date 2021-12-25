@@ -81,8 +81,37 @@ def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     Vykresleni grafu s lokalitou vsech nehod
     v kraji shlukovanych do clusteru
     """
-    pass
+    # Static things
+    chosen_region = "JHM"
+    title_str = f"Nehody v {chosen_region} kraji na cestách 1. triedy"
 
+    # Subplots
+    fig, ax = plt.subplots(1, 1, figsize=(6, 4))
+
+    # filter region, roadtype and transform to webmercator
+    data = gdf[(gdf["region"] == chosen_region) & (gdf["p36"] == 1)].to_crs("EPSG:3857")
+
+    # collect points in a 2d array
+    points = np.reshape(list(zip(data.geometry.x, data.geometry.y)), (-1, 2))
+
+    # cluster into frequency groups
+    data["frequency_group"] = sklearn.cluster.AgglomerativeClustering(n_clusters=20).fit(points).labels_
+
+    # magic at this point.. for each group of points assign the cluster size
+    # this value will represent the color in the resulting map
+    data = data.dissolve(by="frequency_group", aggfunc={"p1": "count"})
+
+    data.plot(ax=ax, markersize=1, column="p1", legend=True)
+    ax.set_axis_off()
+    ctx.add_basemap(ax, crs=data.crs.to_string(), alpha=0.9, attribution_size=6,
+                    reset_extent=False, source=ctx.providers.Stamen.TonerLite)
+
+    if fig_location:
+        Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(fig_location)
+
+    if show_figure:
+        plt.show()
 
 if __name__ == "__main__":
     # zde muzete delat libovolne modifikace
