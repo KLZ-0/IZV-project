@@ -42,7 +42,7 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     title_str = chosen_region + " kraj: {road_type} ({year})"
 
     # Subplots
-    fig, ax = plt.subplots(3, 2, figsize=(8.27, 11.69), sharex="all", sharey="all")
+    fig, ax = plt.subplots(3, 2, figsize=(8.27, 11.69))
 
     # filter region and transform to webmercator
     data = gdf[gdf["region"] == chosen_region].to_crs("EPSG:3857")
