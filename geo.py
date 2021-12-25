@@ -1,6 +1,5 @@
 #!/usr/bin/python3.8
 # coding=utf-8
-import tempfile
 from pathlib import Path
 
 import pandas as pd
@@ -43,7 +42,7 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     title_str = chosen_region + " kraj: {road_type} ({year})"
 
     # Subplots
-    fig, ax = plt.subplots(3, 2, figsize=(8.27, 11.69))
+    fig, ax = plt.subplots(3, 2, figsize=(8.27, 11.69), sharex="all", sharey="all")
 
     # filter region and transform to webmercator
     data = gdf[gdf["region"] == chosen_region].to_crs("EPSG:3857")
@@ -53,8 +52,7 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     data = data[data["date"].dt.year.isin([2018, 2019, 2020]) & data["p36"].isin([0, 1])]
 
     # Save the map using the whole boundary -> same map for each subplot
-    mapfile = tempfile.NamedTemporaryFile()
-    ctx.bounds2raster(*data.total_bounds, path=mapfile.name, source=ctx.providers.Stamen.TonerLite)
+    bounds = data.total_bounds
 
     for i, ax_year in enumerate(ax):
         target_year = 2018 + i
@@ -62,10 +60,11 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
 
         for u, ax_roadtype in enumerate(ax_year):
             ax_roadtype.set_axis_off()
+            ax_roadtype.set_xlim(xmin=bounds[0], xmax=bounds[2])
+            ax_roadtype.set_ylim(ymin=bounds[1], ymax=bounds[3])
             data[bitmap_year & (data["p36"] == u)].plot(ax=ax_roadtype, markersize=1, color=colors[u])
-            ctx.add_basemap(ax_roadtype, crs=data.crs.to_string(), alpha=0.9,
-                            reset_extent=False, source=mapfile.name)
-            ctx.add_attribution(ax_roadtype, ctx.providers.Stamen.TonerLite.attribution, font_size=6)
+            ctx.add_basemap(ax_roadtype, crs=data.crs.to_string(), alpha=0.9, attribution_size=6,
+                            reset_extent=False, source=ctx.providers.Stamen.TonerLite)
             ax_roadtype.set_title(title_str.format(road_type=roadtypes[u], year=target_year), fontsize="small")
 
     if fig_location:
