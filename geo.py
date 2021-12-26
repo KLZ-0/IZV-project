@@ -97,6 +97,9 @@ def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     points = np.reshape(list(zip(data.geometry.x, data.geometry.y)), (-1, 2))
 
     # cluster into frequency groups
+    # Agglomerative clustering was chosen because of many clusters and connectivity constraints
+    # Agglomerative clustering also resembles the given example map the most
+    # and produces the same result in each run unlike e.g. MiniBatch KMeans
     data["frequency_group"] = sklearn.cluster.AgglomerativeClustering(n_clusters=20).fit(points).labels_
 
     # magic at this point.. for each group of points assign the cluster size
