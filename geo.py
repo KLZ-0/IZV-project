@@ -12,8 +12,9 @@ import numpy as np
 
 def make_geo(df: pd.DataFrame) -> geopandas.GeoDataFrame:
     """
-    Konvertovani dataframe
-    do geopandas.GeoDataFrame se spravnym kodovani
+    Converts the given dataframe to a GeoDataFrame
+    :param df: dataframe with "d" and "e" columns as coordinates
+    :return: a valid GeoDataFrame
     """
     # Make a date column
     df["date"] = pd.to_datetime(df["p2a"], cache=True)
@@ -32,9 +33,12 @@ def make_geo(df: pd.DataFrame) -> geopandas.GeoDataFrame:
 def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
              show_figure: bool = False):
     """
-    Vykresleni grafu s sesti podgrafy podle lokality nehody
-     (dalnice vs prvni trida) pro roky 2018-2020
-     """
+    Plots accident locations to 6 subplots depending on road type and year
+    :param gdf: the GeoDataFrame from which to plot
+    :param fig_location: file name where the figure should be saved
+    :param show_figure: if True shows the figure at runtime
+    :return: None
+    """
     # Static things
     colors = ["green", "red"]
     roadtypes = ["dialnice", "cesty prvej triedy"]
@@ -80,8 +84,11 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
 def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
                  show_figure: bool = False):
     """
-    Vykresleni grafu s lokalitou vsech nehod
-    v kraji shlukovanych do clusteru
+    Plots accident locations with clustered color depending on the frequency of accidents in that location
+    :param gdf: the GeoDataFrame from which to plot
+    :param fig_location: file name where the figure should be saved
+    :param show_figure: if True shows the figure at runtime
+    :return: None
     """
     # Static things
     chosen_region = "JHM"
@@ -98,8 +105,8 @@ def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
 
     # cluster into frequency groups
     # Agglomerative clustering was chosen because of many clusters and connectivity constraints
-    # Agglomerative clustering also resembles the given example map the most
-    # and produces the same result in each run unlike e.g. MiniBatch KMeans
+    # The results after agglomerative clustering also resemble the given example map the most
+    # and this clustering method produces similar results in each run unlike e.g. MiniBatch KMeans
     data["frequency_group"] = sklearn.cluster.AgglomerativeClustering(n_clusters=20).fit(points).labels_
 
     # magic at this point.. for each group of points assign the cluster size
