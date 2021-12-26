@@ -42,7 +42,7 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     title_str = chosen_region + " kraj: {road_type} ({year})"
 
     # Subplots
-    fig, ax = plt.subplots(3, 2, figsize=(8.27, 11.69))
+    fig, ax = plt.subplots(3, 2, figsize=(8, 10))
 
     # filter region and transform to webmercator
     data = gdf[gdf["region"] == chosen_region].to_crs("EPSG:3857")
@@ -67,6 +67,8 @@ def plot_geo(gdf: geopandas.GeoDataFrame, fig_location: str = None,
                             reset_extent=False, source=ctx.providers.Stamen.TonerLite)
             ax_roadtype.set_title(title_str.format(road_type=roadtypes[u], year=target_year), fontsize="small")
 
+    plt.tight_layout()
+
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(fig_location)
@@ -86,7 +88,7 @@ def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     title_str = f"Nehody v {chosen_region} kraji na cestách 1. triedy"
 
     # Subplots
-    fig, ax = plt.subplots(1, 1, figsize=(6, 4))
+    fig, ax = plt.subplots(1, 1, figsize=(8, 6))
 
     # filter region, roadtype and transform to webmercator
     data = gdf[(gdf["region"] == chosen_region) & (gdf["p36"] == 1)].to_crs("EPSG:3857")
@@ -105,6 +107,8 @@ def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     ax.set_axis_off()
     ctx.add_basemap(ax, crs=data.crs.to_string(), alpha=0.9, attribution_size=6,
                     reset_extent=False, source=ctx.providers.Stamen.TonerLite)
+    ax.set_title(title_str, fontsize="small")
+    plt.tight_layout()
 
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
