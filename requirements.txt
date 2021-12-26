@@ -7,3 +7,4 @@ seaborn
 geopandas
 contextily
 sklearn
+scipy
