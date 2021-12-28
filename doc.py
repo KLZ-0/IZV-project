@@ -100,6 +100,9 @@ def plot_fig(df: pd.DataFrame,
     s.set_ylabel("Accidents")
     s.get_legend().set(title="Weather condition")
 
+    w_total_stc = data[data["region"] == "STC"]["p1"].sum()
+    print(f"Total accidents caused while worsened conditions: {w_total_stc}")
+
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(fig_location)
