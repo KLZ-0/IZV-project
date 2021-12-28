@@ -69,13 +69,13 @@ def plot_fig(df: pd.DataFrame,
     total_diff = groups.iloc[0].append(groups.iloc[1:].sum(), ignore_index=True)[::-1]
     total_diff.plot(kind="pie", y="p1", ax=ax1, legend=False,
                     labels=["Worsened", "Ideal"], colormap=pie1_cmap, explode=(0, 0.1))
-    ax1.set_title("Weather conditions")
+    ax1.set_title("Weather conditions at accidents overall")
     ax1.set_ylabel("")
 
     # right pie chart - worsened conditions by type
     worsened = groups.iloc[1:]
     worsened.plot(kind="pie", y="p1", ax=ax2, legend=False)
-    ax2.set_title("Worsened weather conditions by type")
+    ax2.set_title("Worsened weather conditions")
     ax2.set_ylabel("")
 
     # filter out normal weather so it does not affect the figure too much
@@ -92,7 +92,7 @@ def plot_fig(df: pd.DataFrame,
 
     # bottom bar plot
     s = sns.barplot(data=data, x="region", y="p1", hue="weather", ax=ax3)
-    s.set_title("Accidents caused by a specific weather condition across regions")
+    s.set_title("Accidents caused by worsened weather conditions across regions")
     s.set_xlabel("Region")
     s.set_ylabel("Accidents")
     s.get_legend().set(title="Weather condition")
