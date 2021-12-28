@@ -157,7 +157,6 @@ def table_to_tex(df: pd.DataFrame,
 
 
 if __name__ == '__main__':
-    # TODO: turn off show_figure
     df_v = get_dataframe("accidents.pkl.gz")
-    plot_fig(df_v, fig_location="fig.pdf", show_figure=True)
+    plot_fig(df_v, fig_location="fig.pdf", show_figure=False)
     table_to_tex(create_table(df_v))
