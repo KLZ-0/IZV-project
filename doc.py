@@ -72,6 +72,8 @@ def plot_fig(df: pd.DataFrame,
                     labels=["Worsened", "Ideal"], colormap=pie1_cmap, explode=(0, 0.1))
     ax1.set_title("Weather conditions at accidents overall")
     ax1.set_ylabel("")
+    w_perc = (total_diff[1] / total_diff.sum()) * 100
+    print(f"total percentage of worsened conditions during accidents: {w_perc:.2f}%")
 
     # right pie chart - worsened conditions by type
     worsened = groups.iloc[1:]
@@ -140,8 +142,10 @@ def table_to_tex(df: pd.DataFrame,
     :param stream: stream to write the data
     :return: None
     """
+    print("%%%%%%%% INSERT TABLE %%%%%%%%")
     df.columns = [col.year for col in df.columns]
     df.to_latex(buf=stream)
+    print("%%%%%%%% INSERT TABLE %%%%%%%%")
 
 
 if __name__ == '__main__':
