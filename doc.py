@@ -68,7 +68,7 @@ def plot_fig(df: pd.DataFrame,
 
     # left pie chart - weather conditions generalized
     total_diff = groups.iloc[0].append(groups.iloc[1:].sum(), ignore_index=True)[::-1]
-    total_diff.plot(kind="pie", y="p1", ax=ax1, legend=False,
+    total_diff.plot(kind="pie", ax=ax1, legend=False,
                     labels=["Worsened", "Ideal"], colormap=pie1_cmap, explode=(0, 0.1))
     ax1.set_title("Weather conditions at accidents overall")
     ax1.set_ylabel("")
