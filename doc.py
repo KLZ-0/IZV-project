@@ -7,6 +7,9 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt, gridspec, cm, colors
 
+weather_labels = ["Ideal", "Fog", "Light rain", "Rain",
+                  "Snow", "Frost", "Strong wind"]
+
 
 def get_dataframe(filename: str) -> pd.DataFrame:
     """
@@ -39,8 +42,6 @@ def plot_fig(df: pd.DataFrame,
     :return: None
     """
     # Static things
-    labels = ["Ideal", "Fog", "Light rain", "Rain",
-              "Snow", "Frost", "Strong wind"]
     pie1_cmap = colors.ListedColormap(["darkred", "lightgrey"])
 
     # plot setup
@@ -57,7 +58,7 @@ def plot_fig(df: pd.DataFrame,
 
     # categorize and label the weather
     df["weather"] = pd.cut(df["p18"], [i for i in range(8)],
-                           labels=labels)
+                           labels=weather_labels)
 
     # filter out "other" weather conditions
     df = df[df["p18"] > 0]
@@ -82,7 +83,7 @@ def plot_fig(df: pd.DataFrame,
     # we only want to see worsened conditions
     df = df[df["p18"] > 1]
     df["weather"] = pd.cut(df["p18"], [i for i in range(1, 8)],
-                           labels=labels[1:])
+                           labels=weather_labels[1:])
 
     # aggregate by weather and region
     data = df.groupby(["region", "weather"]).agg({"p1": "count"}).reset_index()
@@ -111,7 +112,23 @@ def create_table(df: pd.DataFrame) -> pd.DataFrame:
     :param df: dataframe to examine
     :return: formatted dataframe
     """
-    pass
+    # categorize and label the weather
+    df["weather"] = pd.cut(df["p18"], [i for i in range(8)],
+                           labels=weather_labels)
+    # filter out "other" weather conditions
+    df = df[df["p18"] > 0]
+
+    # aggregate by weather and date
+    data = df.groupby(["weather", "date"]).agg({"p1": "count"})
+
+    # expand index, undersample and restore index
+    data = data.unstack("weather")
+    data = data.resample("Y").sum()
+    data = data.stack("weather")
+    data.reset_index(inplace=True)
+
+    # create pivot table
+    return pd.pivot_table(data, index="weather", columns="date", values="p1")
 
 
 def table_to_tex(df: pd.DataFrame,
@@ -122,7 +139,7 @@ def table_to_tex(df: pd.DataFrame,
     :param stream: stream to write the data
     :return: None
     """
-    pass
+    df.to_latex(buf=stream)
 
 
 if __name__ == '__main__':
