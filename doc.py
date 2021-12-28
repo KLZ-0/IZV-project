@@ -103,6 +103,11 @@ def plot_fig(df: pd.DataFrame,
     w_total_stc = data[data["region"] == "STC"]["p1"].sum()
     print(f"Total accidents caused while worsened conditions: {w_total_stc}")
 
+    pha = data[data["region"] == "PHA"].set_index("weather")
+    w_rain_perc_pha = (pha.loc["Rain", "p1"] / pha["p1"].sum()) * 100
+    print(f"Percentage of acidents caused while raining "
+          f"compared to all worsened conditions in PHA: {w_rain_perc_pha:.2f}%")
+
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(fig_location)
