@@ -1,3 +1,4 @@
+import re
 import sys
 from pathlib import Path
 from typing import TextIO
@@ -149,9 +150,18 @@ def table_to_tex(df: pd.DataFrame,
     :param stream: stream to write the data
     :return: None
     """
-    print("%%%%%%%% INSERT TABLE %%%%%%%%")
     df.columns = [col.year for col in df.columns]
-    df.to_latex(buf=stream, caption="Accidents caused by weather conditions over the past years", position="h")
+    tex = df.to_latex(caption="Accidents caused by weather conditions over the past years",
+                      position="h",
+                      bold_rows=True)
+
+    # Substitute a few things
+    tex = re.sub(r"^\\textbf{weather.*$\n", "", tex, flags=re.MULTILINE)
+    tex = re.sub(r"^{}", r"\\textbf{Weather}", tex, flags=re.MULTILINE)
+
+    # Print the latex table
+    print("%%%%%%%% INSERT TABLE %%%%%%%%")
+    print(tex, file=stream, end="")
     print("%%%%%%%% INSERT TABLE %%%%%%%%")
 
 
