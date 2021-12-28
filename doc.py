@@ -75,7 +75,7 @@ def plot_fig(df: pd.DataFrame,
     # right pie chart - worsened conditions by type
     worsened = groups.iloc[1:]
     worsened.plot(kind="pie", y="p1", ax=ax2, legend=False)
-    ax2.set_title("Worsened weather conditions")
+    ax2.set_title("Worsened weather conditions by type")
     ax2.set_ylabel("")
 
     # filter out normal weather so it does not affect the figure too much
