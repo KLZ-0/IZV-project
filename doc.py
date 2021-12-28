@@ -5,7 +5,7 @@ from typing import TextIO
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt, gridspec
+from matplotlib import pyplot as plt, gridspec, cm, colors
 
 
 def get_dataframe(filename: str) -> pd.DataFrame:
@@ -41,6 +41,7 @@ def plot_fig(df: pd.DataFrame,
     # Static things
     labels = ["Ideal", "Fog", "Light rain", "Rain",
               "Snow", "Frost", "Strong wind"]
+    pie1_cmap = colors.ListedColormap(["darkred", "lightgrey"])
 
     # plot setup
     sns.set_theme(style="whitegrid")
@@ -65,8 +66,9 @@ def plot_fig(df: pd.DataFrame,
     groups = df.groupby("weather").agg({"p1": "count"})
 
     # left pie chart - weather conditions generalized
-    total_diff = groups.iloc[0].append(groups.iloc[1:].sum(), ignore_index=True)
-    total_diff.plot(kind="pie", y="p1", ax=ax1, legend=False, labels=["Ideal", "Worsened"])
+    total_diff = groups.iloc[0].append(groups.iloc[1:].sum(), ignore_index=True)[::-1]
+    total_diff.plot(kind="pie", y="p1", ax=ax1, legend=False,
+                    labels=["Worsened", "Ideal"], colormap=pie1_cmap, explode=(0, 0.1))
     ax1.set_title("Weather conditions")
     ax1.set_ylabel("")
 
