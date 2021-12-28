@@ -101,7 +101,7 @@ def plot_fig(df: pd.DataFrame,
     s.get_legend().set(title="Weather condition")
 
     w_total_stc = data[data["region"] == "STC"]["p1"].sum()
-    print(f"Total accidents caused while worsened conditions: {w_total_stc}")
+    print(f"Total accidents caused while worsened conditions in STC region: {w_total_stc}")
 
     pha = data[data["region"] == "PHA"].set_index("weather")
     w_rain_perc_pha = (pha.loc["Rain", "p1"] / pha["p1"].sum()) * 100
