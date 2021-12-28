@@ -61,29 +61,34 @@ def plot_fig(df: pd.DataFrame,
     # filter out non-fatal accidents and remove "other" weather conditions
     df = df[(df["p13a"] > 0) & (df["p18"] > 0)]
 
-    # group by weather
+    # aggregate by weather
     groups = df.groupby("weather").agg({"p1": "count"})
 
-    # Left pie chart - weather conditions generalized
+    # left pie chart - weather conditions generalized
     total_diff = groups.iloc[0].append(groups.iloc[1:].sum(), ignore_index=True)
     total_diff.plot(kind="pie", y="p1", ax=ax1, legend=False, labels=["Ideal", "Worsened"])
     ax1.set_title("Weather conditions")
     ax1.set_ylabel("")
 
-    # Right pie chart - worsened conditions by type
+    # right pie chart - worsened conditions by type
     worsened = groups.iloc[1:]
     worsened.plot(kind="pie", y="p1", ax=ax2, legend=False)
     ax2.set_title("Worsened weather conditions by type")
     ax2.set_ylabel("")
 
     # filter out normal weather so it does not affect the figure too much
+    # we only want to see worsened conditions
     df = df[df["p18"] > 1]
     df["weather"] = pd.cut(df["p18"], [i for i in range(1, 8)],
                            labels=labels[1:])
 
+    # aggregate by weather and region
     data = df.groupby(["region", "weather"]).agg({"p1": "count"}).reset_index()
 
+    # sort the dataframe so the regions are roughly descending
     data.sort_values(by=["p1"], ascending=False, inplace=True)
+
+    # bottom bar plot
     s = sns.barplot(data=data, x="region", y="p1", hue="weather", ax=ax3)
     s.set_title("Accidents caused by a specific weather condition across regions")
     s.set_xlabel("Region")
@@ -96,8 +101,6 @@ def plot_fig(df: pd.DataFrame,
 
     if show_figure:
         plt.show()
-
-    pass
 
 
 def create_table(df: pd.DataFrame) -> pd.DataFrame:
