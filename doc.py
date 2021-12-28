@@ -2,9 +2,10 @@ import sys
 from pathlib import Path
 from typing import TextIO
 
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, gridspec
 
 
 def get_dataframe(filename: str) -> pd.DataFrame:
@@ -31,42 +32,63 @@ def plot_fig(df: pd.DataFrame,
     """
     Plot the figure for the report
     Dependence of wather on accidents and deaths
+    fatal accidents (p13a > 0) depending on weather
     :param df: dataframe to examine
     :param fig_location: file name where the figure should be saved
     :param show_figure: if True shows the figure at runtime
     :return: None
     """
     # Static things
-    labels = ["Hmla", "Na počiatku dažďa", "Dážď",
-              "Sneženie", "Tvorí sa námraza", "Nárazový vietor"]
+    labels = ["Ideal", "Fog", "Light rain", "Rain",
+              "Snow", "Frost", "Strong wind"]
 
     # plot setup
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7.5))
     sns.set_theme(style="whitegrid")
+    # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7.5))
+    fig = plt.figure(constrained_layout=True,
+                     figsize=(10, 7.5))
+    spec = gridspec.GridSpec(ncols=2, nrows=2,
+                             figure=fig)
+
+    ax1 = fig.add_subplot(spec[0, 0])
+    ax2 = fig.add_subplot(spec[0, 1])
+    ax3 = fig.add_subplot(spec[1, :])
 
     # categorize and label the weather
-    df["weather"] = pd.cut(df["p18"], [i for i in range(1, 8)],
+    df["weather"] = pd.cut(df["p18"], [i for i in range(8)],
                            labels=labels)
 
-    # filter out non-fatal accidents and remove normal weather
-    df = df[(df["p13a"] > 0) & (df["p18"] > 1)]
+    # filter out non-fatal accidents and remove "other" weather conditions
+    df = df[(df["p13a"] > 0) & (df["p18"] > 0)]
 
-    # fatal accidents (p13a > 0) depending on weather
+    # group by weather
     groups = df.groupby("weather").agg({"p1": "count"})
 
-    pivot = pd.pivot_table(df, columns=["region"], values="p1",
-                           index=["weather"], aggfunc="count")
+    # Left pie chart - weather conditions generalized
+    total_diff = groups.iloc[0].append(groups.iloc[1:].sum(), ignore_index=True)
+    total_diff.plot(kind="pie", y="p1", ax=ax1, legend=False, labels=["Ideal", "Worsened"])
+    ax1.set_title("Weather conditions")
+    ax1.set_ylabel("")
+
+    # Right pie chart - worsened conditions by type
+    worsened = groups.iloc[1:]
+    worsened.plot(kind="pie", y="p1", ax=ax2, legend=False)
+    ax2.set_title("Worsened weather conditions by type")
+    ax2.set_ylabel("")
+
+    # filter out normal weather so it does not affect the figure too much
+    df = df[df["p18"] > 1]
+    df["weather"] = pd.cut(df["p18"], [i for i in range(1, 8)],
+                           labels=labels[1:])
 
     data = df.groupby(["region", "weather"]).agg({"p1": "count"}).reset_index()
 
-    s = sns.barplot(data=data, x="region", y="p1", hue="weather", ax=ax2)
-
-    # s = sns.catplot(data=data, x="region", y="p1", hue="weather", legend=True, legend_out=True, kind="bar")
-
-    # s = sns.catplot(data=data, x="region", y="p1",
-    #                 col="weather", col_wrap=3, kind="bar",
-    #                 height=2.5, aspect=1.15, legend=False,
-    #                 sharey=False, sharex=False)
+    data.sort_values(by=["p1"], ascending=False, inplace=True)
+    s = sns.barplot(data=data, x="region", y="p1", hue="weather", ax=ax3)
+    s.set_title("Accidents caused by a specific weather condition across regions")
+    s.set_xlabel("Region")
+    s.set_ylabel("Accidents")
+    s.get_legend().set(title="Weather condition")
 
     if fig_location:
         Path(fig_location).parent.mkdir(parents=True, exist_ok=True)
