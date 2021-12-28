@@ -115,8 +115,9 @@ def create_table(df: pd.DataFrame) -> pd.DataFrame:
     # categorize and label the weather
     df["weather"] = pd.cut(df["p18"], [i for i in range(8)],
                            labels=weather_labels)
-    # filter out "other" weather conditions
-    df = df[df["p18"] > 0]
+
+    # filter out "other" weather conditions and limit to years before 2021
+    df = df[(df["p18"] > 0) & (df["date"].dt.year < 2021)]
 
     # aggregate by weather and date
     data = df.groupby(["weather", "date"]).agg({"p1": "count"})
@@ -139,6 +140,7 @@ def table_to_tex(df: pd.DataFrame,
     :param stream: stream to write the data
     :return: None
     """
+    df.columns = [col.year for col in df.columns]
     df.to_latex(buf=stream)
 
 
