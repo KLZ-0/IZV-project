@@ -75,3 +75,12 @@ Komentar k hodnoceni (zejmena k vizualizacim)
 ================================================================================
 v poradku, jen animals nejsou filtrovane dle p58
 ```
+
+## [Part 3](/nehody-zadani.pdf)
+
+Contents:
+
+- [geo.py](/geo.py)
+- [stat.ipynb](/stat.ipynb)
+- [doc.py](/doc.py)
+- [doc.pdf](/doc.pdf)

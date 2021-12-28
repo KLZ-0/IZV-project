@@ -4,3 +4,4 @@
 /__pycache__/
 /accidents.pkl.gz
 *.png
+fig.pdf
