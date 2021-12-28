@@ -2,10 +2,9 @@ import sys
 from pathlib import Path
 from typing import TextIO
 
-import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt, gridspec, cm, colors
+from matplotlib import pyplot as plt, gridspec, colors
 
 weather_labels = ["Ideal", "Fog", "Light rain", "Rain",
                   "Snow", "Frost", "Strong wind"]
@@ -152,7 +151,7 @@ def table_to_tex(df: pd.DataFrame,
     """
     print("%%%%%%%% INSERT TABLE %%%%%%%%")
     df.columns = [col.year for col in df.columns]
-    df.to_latex(buf=stream)
+    df.to_latex(buf=stream, caption="Accidents caused by weather conditions over the past years", position="h")
     print("%%%%%%%% INSERT TABLE %%%%%%%%")
 
 
