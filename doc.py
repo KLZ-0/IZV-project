@@ -59,8 +59,8 @@ def plot_fig(df: pd.DataFrame,
     df["weather"] = pd.cut(df["p18"], [i for i in range(8)],
                            labels=labels)
 
-    # filter out non-fatal accidents and remove "other" weather conditions
-    df = df[(df["p13a"] > 0) & (df["p18"] > 0)]
+    # filter out "other" weather conditions
+    df = df[df["p18"] > 0]
 
     # aggregate by weather
     groups = df.groupby("weather").agg({"p1": "count"})
