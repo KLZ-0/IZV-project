@@ -127,6 +127,7 @@ def plot_cluster(gdf: geopandas.GeoDataFrame, fig_location: str = None,
     if show_figure:
         plt.show()
 
+
 if __name__ == "__main__":
     # zde muzete delat libovolne modifikace
     gdf_v = make_geo(pd.read_pickle("accidents.pkl.gz"))
