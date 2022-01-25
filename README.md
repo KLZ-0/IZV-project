@@ -6,12 +6,20 @@
 
 The project is evaluated in 3 separate parts
 
+Total points: 93 (easy 1A)
+
+Total time: ~6 days (probably less if you are using your time efficiently...)
+
 ## [Part 1](/zadani1.pdf)
 
 Contents:
 
 - [download.py](/download.py)
 - [get_stat.py](/get_stat.py)
+
+Generated figures:
+
+- [get_stat.get_stat()](/fig/01/get_stat.pdf)
 
 Rating (20/20):
 
@@ -45,6 +53,12 @@ hodnoty :-)
 Contents:
 
 - [analysis.py](/analysis.py)
+
+Generated figures:
+
+- [analysis.plot_roadtype()](/fig/02/01_roadtype.pdf)
+- [analysis.plot_animals()](/fig/02/02_animals.pdf)
+- [analysis.plot_conditions()](/fig/02/03_conditions.pdf)
 
 Rating (19/20):
 
@@ -84,3 +98,58 @@ Contents:
 - [stat.ipynb](/stat.ipynb)
 - [doc.py](/doc.py)
 - [doc.pdf](/doc.pdf)
+
+Generated figures:
+
+- [geo.plot_geo()](/fig/03/geo1.png)
+- [geo.plot_cluster()](/fig/03/geo2.png)
+- [doc.plot_fig()](/fig/03/fig.pdf)
+
+Rating (54/60):
+
+```
+Hodnoceni treti casti projektu: xkalaz00
+================================================================================
+Geograficka data
+--------------------------------------------------------------------------------
++1.00 spravne CRS (5514, 3857) (az 1 b)
++2.00 spravne rozsah (viz FAQ) (az 2 b)
++2.00 pocet radku 571225 > 10 000 (az 2 b)
++2.00 bez NaN v souradnicich (az 2 b)
++3.00 plot_geo: prehlednost, vzhled (az 3 b)
++2.00 plot_geo: zobrazeni ve WebMercator (a ne v S-JTSK) (az 2 b)
++1.00 plot_cluster: prehlednost, vzhled (az 2 b)
++3.00 plot_cluster: clustering (az 3 b)
++1.00 funkce make_geo ma spravne docstring (PEP257) (az 1 b)
++0.50 funkce plot_geo ma spravne docstring (PEP257) (az 0.5 b)
++0.50 funkce plot_cluster ma spravne docstring (PEP257) (az 0.5 b)
++1.00 kvalita kodu dle PEP8 (0 kritickych, 0 E2.., 0 E7..)) (az 1 b)
+
+Overeni hypotezy
+--------------------------------------------------------------------------------
++1.00 #1: kontingencni tabulka (az 1 b)
++2.00 #1: vypocet chi2 testu (az 2 b)
++2.00 #1: zaver: dochazi k silnemu ovlivneni (az 2 b)
++0.00 #2 filtrace (az 1 b)
++0.00 #2 vypocet a zaver (az 4 b)
+
+Vlastni analyza
+--------------------------------------------------------------------------------
++5.00 tabulka: prehlednost, vzhled (az 5 b)
++4.00 graf: popis, vzhled (az 4 b)
++4.00 graf: vhodna velikost, citelnost (az 4 b)
++2.00 graf: pouziti vektoroveho formatu (az 2 b)
++3.00 textovy popis (az 3 b)
++4.00 statisticka smysluplnost analyzy (az 4 b)
++3.00 dalsi ciselne hodnoty v textu (az 3 b)
++3.00 generovani hodnot skriptem (az 3 b)
++2.00 kvalita kodu dle PEP8 (0 kritickych, 0 E2.., 0 E7..)) (az 2 b)
+
+CELKEM: 54.0 bodu
+
+Komentar k hodnoceni (zejmena k vizualizacim)
+================================================================================
+cluster: nepopsany cbar
+hypo2: nedela se pres kontingencni tabulku!!!
+doc: pekne
+```

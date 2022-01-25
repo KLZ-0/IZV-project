@@ -3,5 +3,5 @@
 /data/
 /__pycache__/
 /accidents.pkl.gz
-*.png
-fig.pdf
+/*.png
+/fig.pdf
